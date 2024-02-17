@@ -33,15 +33,13 @@ namespace shikaku
         //Estado de jueg tiene 2 Coor - act (actual) y ori (origen). Si no hay rectángulo seleccionado, ori.x = -1
         static void Main()
         {
+            //Para lee nivel, tenemos que solicitar antes de teclado al usuario que nos diga el nivel...
             Tablero tablero = new Tablero();
 
-            ////Leemos el nivel de teclado
-            //Console.WriteLine("Nivel: XXX");
-            //string nivel = Console.ReadLine();
-            //LeeNivel("puzzles/" + nivel + ".txt", out tablero);
+            Console.Write("Nivel: XXX");
+            int nivel = int.Parse(Console.ReadLine());
 
-            LeeNivel("puzzles/000.txt", out tablero);
-
+            LeeNivel("puzzles/" + nivel + ".txt", out tablero);
             Debug(tablero, DEBUG);
 
         }
@@ -57,44 +55,45 @@ namespace shikaku
             tab.fils = int.Parse(nivel.ReadLine());
             tab.cols = int.Parse(nivel.ReadLine());
 
-            //Crearemos un array auxiliar de tamaño máximo, que posteriormente, redimensionaremos para convertirlo en tab.pils 
-            Pilar[] pilarAux = new Pilar[tab.fils * tab.cols];
+            //Crearemos un array auxiliar, de tamaño máximo, que posteriormente, redimensionaremos para convertirlo en tab.pils 
+            Pilar[] pilars = new Pilar[tab.fils * tab.cols];
             //Variable para redimensionar
             int tamanoPils = 0;
 
-            //Leemos el resto de filas
-            int i = 0; //Fila en la que nos encontramos
-            while (!nivel.EndOfStream && i < tab.fils)
+            //Leemos el resto de filas, dando por hecho que el archivo es correcto
+            while (!nivel.EndOfStream) 
             {
-                //Leemos línea a línea
-                string[] fila = nivel.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                //Como ya sabemos el tamaño del tablero, no será un problema. 
+                string[] pilares = nivel.ReadLine().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                //Recorremos la fila, buscando pilares
-                for (int j = 0; j < fila.Length; j++) 
+                //Ahora, solo nos quedaremos con los valores numéricos, donde si que haya un pilar
+                for (int i = 0; i < pilares.Length; i++)
                 {
-                    //Si hay pilares, aumentaremos el tamaño del array final y rellenamos el auxiliar
-                    if (fila[j] != "-")
+                    if (pilares[i] != "-")
                     {
-                        //Valor
-                        pilarAux[tamanoPils].val = int.Parse(fila[j]);
-                        //Coordenadas
-                        pilarAux[tamanoPils].coor.x = j % tab.cols;
-                        pilarAux[tamanoPils].coor.y = i;
-
                         tamanoPils++;
+
+                        //Recorremos los pilares del tablero y lo rellenamos
+                        for (int j = 0; j < pilars.Length; j++)
+                        {
+                            //Valor
+                            pilars[j].val = int.Parse(pilares[i]);
+                            //Coordenadas
+                            pilars[j].coor.y = i / tab.fils;
+                            pilars[j].coor.x = i % tab.cols;
+                        }
                     }
                 }
-                i++;
             }
 
             //Ahora, rellenamos pils en su tamaño real
             tab.pils = new Pilar[tamanoPils];
-            for (int j = 0; j < tab.pils.Length; j++) 
+            for (int i = 0; i < tab.pils.Length; i++) 
             {
-                tab.pils[j] = pilarAux[j];
+                tab.pils[i] = pilars[i];
             }
 
-            //Creamos el array de rectángulos
+            //Dimensionamos el array de rectángulos
             tab.rects = new Rect[tab.fils * tab.cols];
 
             //Inicialmente no hay ningún rectángulo
@@ -146,17 +145,7 @@ namespace shikaku
         }
         #endregion
 
-        static void Render(Tablero tab, Coor act, Coor ori)
-        {
-            //Tablero Vacío
 
-
-
-
-
-
-
-        }
 
 
 
