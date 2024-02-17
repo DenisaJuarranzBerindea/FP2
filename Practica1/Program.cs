@@ -1,5 +1,8 @@
 ﻿//Denisa Juarranz Berindea
 
+using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
+
 namespace shikaku
 {
     class Program
@@ -28,22 +31,26 @@ namespace shikaku
             public Pilar[] pils;    // array de pilares
             public Rect[] rects;    // array de rectángulos
             public int numRects;    // num de rectángulos definidos = prim pos libre en rect
-        } 
+        }
 
-        //Estado de jueg tiene 2 Coor - act (actual) y ori (origen). Si no hay rectángulo seleccionado, ori.x = -1
         static void Main()
         {
             Tablero tablero = new Tablero();
+            Coor ori = new Coor();
+            //ori.x = -1; //Si no hay rectangulo
+            Coor act = new Coor();
 
             ////Leemos el nivel de teclado
             //Console.WriteLine("Nivel: XXX");
             //string nivel = Console.ReadLine();
+            //Console.WriteLine();
             //LeeNivel("puzzles/" + nivel + ".txt", out tablero);
 
             LeeNivel("puzzles/000.txt", out tablero);
 
             Debug(tablero, DEBUG);
 
+            Render(tablero, act, ori);
         }
 
         #region Render Nivel
@@ -148,13 +155,40 @@ namespace shikaku
 
         static void Render(Tablero tab, Coor act, Coor ori)
         {
+            Console.Clear();
+
             //Tablero Vacío
+            for (int i = 0; i < tab.fils + 1; i++) 
+            { 
+                for (int j = 0; j < tab.cols + 1; j++) 
+                {
+                    Console.Write("+   ");
+                }
+            
+                Console.WriteLine();
+                Console.WriteLine();
+            }
+
+            ////Pilares, poniendo el número en el centro de la casilla correspondiente.
+            //Console.SetCursorPosition(2, 1);
+            //for (int i = 0; i < tab.fils * 4; i++)
+            //{
+            //    for (int j = 0; j < tab.cols * 4; j++)
+            //    {
+            //        Console.SetCursorPosition(2 + j, 1 + i);
+
+            //    }
+            //}
 
 
 
 
 
+            Console.WriteLine();
+            Console.WriteLine();
+            Debug(tab, DEBUG);
 
+            //Console.SetCursorPosition(act.x, act.y);
 
         }
 
@@ -165,16 +199,14 @@ namespace shikaku
         {
             if (debug) 
             {
-                Console.WriteLine("Columnas: " + tab.cols);
-                Console.WriteLine("Filas: " + tab.fils);
                 Console.WriteLine("n Rectángulos: " + tab.numRects);
 
-                Console.WriteLine("Pilares: ");
-                for (int i = 0; i < tab.pils.Length; i++)
-                {
-                    Console.WriteLine("Valor: " + tab.pils[i].val);
-                    Console.WriteLine("Coordenadas: (" + tab.pils[i].coor.x + ", " + tab.pils[i].coor.y + ")");
-                }
+                //Console.WriteLine("Pilares: ");
+                //for (int i = 0; i < tab.pils.Length; i++)
+                //{
+                //    Console.WriteLine("Valor: " + tab.pils[i].val);
+                //    Console.WriteLine("Coordenadas: (" + tab.pils[i].coor.x + ", " + tab.pils[i].coor.y + ")");
+                //}
 
                 Console.WriteLine("Rectángulos: ");
                 for (int i = 0; i < tab.numRects; i++)
