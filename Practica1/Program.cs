@@ -51,6 +51,12 @@ namespace shikaku
             Debug(tablero, DEBUG);
 
             Render(tablero, act, ori);
+
+            while(true)
+            {
+                ProcesaInput(LeeInput(), tablero, ref act, ori);
+                Render(tablero, act, ori);
+            }
         }
 
         #region Render Nivel
@@ -151,8 +157,7 @@ namespace shikaku
 
             return rect;
         }
-        #endregion
-
+      
         static void Render(Tablero tab, Coor act, Coor ori)
         {
             Console.Clear();
@@ -169,30 +174,101 @@ namespace shikaku
                 Console.WriteLine();
             }
 
-            ////Pilares, poniendo el número en el centro de la casilla correspondiente.
-            //Console.SetCursorPosition(2, 1);
-            //for (int i = 0; i < tab.fils * 4; i++)
-            //{
-            //    for (int j = 0; j < tab.cols * 4; j++)
-            //    {
-            //        Console.SetCursorPosition(2 + j, 1 + i);
+            //Pilares, poniendo el número en el centro de la casilla correspondiente.
+            for (int i = 0; i < tab.pils.Length; i++)
+            {
+                Console.SetCursorPosition(2 + tab.pils[i].coor.x * 4, 1 + tab.pils[i].coor.y * 2);
+                Console.Write(tab.pils[i].val);
+            }
 
-            //    }
-            //}
+            //Rectángulos ya marcados
+            for (int i = 0; i < tab.rects.Length; i++)
+            {
+                RenderRect(tab.rects[i]);
+            }
 
+            //Rectángulos en curso
+            Rect actual = new Rect();
+            actual = NormalizaRect(act, ori);
+            Console.ForegroundColor = ConsoleColor.Green;
+            RenderRect(actual);
 
-
-
-
-            Console.WriteLine();
-            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.White;
+            //Información de Debug
+            Console.SetCursorPosition(0, tab.fils * 2 + 2);
             Debug(tab, DEBUG);
 
-            //Console.SetCursorPosition(act.x, act.y);
+            //Cursor en posición act
+            Console.SetCursorPosition(act.x + 2, act.y + 1);
 
         }
 
+        //Método Auxiliar para dibujar rectángulos
+        static void RenderRect(Rect r)
+        {
+            //Filas
+            for (int i = 0; i < (r.rb.y - r.lt.y); i++)
+            {
+                //Columnas
+                for (int j = 0; j < (r.rb.x - r.lt.x); j++)
+                {
 
+                }
+
+            }
+        }
+
+        #endregion
+
+        #region Lógica Rectángulos
+        static bool Dentro(Coor c, Rect r)
+        {
+            return (c.x >= r.lt.x || c.x <= r.rb.x) && (c.y >= r.lt.y || c.y <= r.rb.y);
+        }
+
+        static bool Intersect(Rect r1, Rect r2)
+        {
+            return (Dentro(r1.lt, r2) && Dentro(r1.rb, r2) && Dentro(r2.lt, r1) && Dentro(r2.rb, r1));
+        }
+
+        static void InsertaRect(Tablero tab, Coor c1, Coor c2)
+        {
+            //Comprobamos si el nuevo rectángulo, normalizado, solapa con alguno ya existente
+            for (int i = 0; i < tab.rects.Length; i++)
+            {
+                //Si no interseca con ninguno, se añade al array de rectángulos
+                if (!Intersect(NormalizaRect(c1, c2), tab.rects[i]))
+                {
+                    tab.rects[tab.numRects] = NormalizaRect(c1, c2);
+                    tab.numRects++;
+                }
+            }
+        }
+
+        bool EliminaRect(Tablero tab, Coor c)
+        {
+            //Daremos por hecho que al inicio esa coordenada no está en ningún rectángulo
+            bool encontrada = false;
+            //Buscamos la coordenada entre los rectángulos del tablero
+            int i = 0;
+            while (i < tab.rects.Length && !Dentro(c, tab.rects[i])) 
+            {
+                i++;
+            }
+
+            if (i == tab.rects.Length)
+            {
+                encontrada = false;
+            }
+
+            if (Dentro(c, tab.rects[i]))
+            {
+                encontrada = true;
+            }
+
+            return encontrada;
+        }
+        #endregion
 
         #region DEBUG
         static void Debug (Tablero tab, bool debug)
@@ -219,6 +295,33 @@ namespace shikaku
 
         }
         #endregion
+
+
+        #region Input
+
+        static void ProcesaInput(char ch, Tablero tab, ref Coor act, Coor ori)
+        {
+            if (ch == 'l' && act.x > 2) //Izquierda
+            {
+                act.x -= 4;
+            }
+            else if (ch == 'r' && act.x < (tab.cols * 4) - 4) //Derecha
+            {
+                act.x += 4;
+            }
+            else if (ch == 'u' && act.y > 1) //Arriba
+            {
+                act.y -= 2;
+            }
+            else if (ch == 'd' && act.y < (tab.fils * 2) - 2) //Abajo
+            {
+                act.y += 2;
+            }
+            else if (ch == 'c')
+            {
+
+            }
+        }
 
         static char LeeInput()
         {
@@ -254,5 +357,7 @@ namespace shikaku
             }
             return d;
         }
+
+        #endregion
     }
 }
