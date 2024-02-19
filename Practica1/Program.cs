@@ -34,7 +34,7 @@ namespace shikaku
         {
             Tablero tablero = new Tablero();
             Coor ori = new Coor();
-            //ori.x = -1; //Si no hay rectangulo
+            ori.x = -1; //Si no hay rectangulo
             Coor act = new Coor();
 
             ////Leemos el nivel de teclado
@@ -203,15 +203,16 @@ namespace shikaku
         //Método Auxiliar para dibujar rectángulos
         static void RenderRect(Rect r)
         {
-            //Filas
-            for (int i = 0; i < (r.rb.y - r.lt.y); i++)
+            for(int i = 0; i < (r.rb.x - r.lt.x); i++)
             {
-                //Columnas
-                for (int j = 0; j < (r.rb.x - r.lt.x); j++)
+                if ((r.rb.y - r.lt.y) % 2 != 0) //Horizontal
                 {
-
+                    Console.WriteLine(" ---");
                 }
-
+                else //Vertical
+                {
+                    Console.WriteLine("|");
+                }
             }
         }
 
@@ -276,13 +277,21 @@ namespace shikaku
         }
         #endregion
 
+        #region Lógica Victoria
+
+        static int AreaRect(Rect r)
+        {
+            return (r.rb.x - r.lt.x) * (r.rb.y - r.lt.y);
+        }
+
+        #endregion
+
         #region DEBUG
         static void Debug (Tablero tab, bool debug, Coor ori, Coor act)
         {
             if (debug) 
             {
-                Console.WriteLine("Act: (" + act.x/4 + "," + act.y/2 + ")");
-                Console.WriteLine("Ori: (" + ori.x + "," + ori.y + ")");
+                Console.WriteLine("Act: (" + act.x / 4 + "," + act.y / 2 + ")   Ori: (" + ori.x + "," + ori.y + ")");
 
                 Console.WriteLine("n Rectángulos: " + tab.numRects);
 
