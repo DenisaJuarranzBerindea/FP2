@@ -45,7 +45,7 @@ namespace shikaku
 
             LeeNivel("puzzles/000.txt", out tablero);
 
-            Debug(tablero, DEBUG);
+            Debug(tablero, DEBUG, ori, act);
 
             Render(tablero, act, ori);
 
@@ -193,7 +193,7 @@ namespace shikaku
             Console.ForegroundColor = ConsoleColor.White;
             //Información de Debug
             Console.SetCursorPosition(0, tab.fils * 2 + 2);
-            Debug(tab, DEBUG);
+            Debug(tab, DEBUG, ori, act);
 
             //Cursor en posición act
             Console.SetCursorPosition(act.x + 2, act.y + 1);
@@ -277,10 +277,13 @@ namespace shikaku
         #endregion
 
         #region DEBUG
-        static void Debug (Tablero tab, bool debug)
+        static void Debug (Tablero tab, bool debug, Coor ori, Coor act)
         {
             if (debug) 
             {
+                Console.WriteLine("Act: (" + act.x/4 + "," + act.y/2 + ")");
+                Console.WriteLine("Ori: (" + ori.x + "," + ori.y + ")");
+
                 Console.WriteLine("n Rectángulos: " + tab.numRects);
 
                 //Console.WriteLine("Pilares: ");
@@ -293,9 +296,10 @@ namespace shikaku
                 Console.WriteLine("Rectángulos: ");
                 for (int i = 0; i < tab.numRects; i++)
                 {
-                    Console.WriteLine("Coordenadas: (" + tab.rects[i].lt + ", " + tab.rects[i].rb + ")");
+                    Console.WriteLine("Coordenadas: ( (" + tab.rects[i].lt.x + ", " + tab.rects[i].lt.y + ") - (" + tab.rects[i].rb.x + ", " + tab.rects[i].rb.y + ") )");
                 }
 
+                
 
             }
 
@@ -324,12 +328,12 @@ namespace shikaku
             }
             else if (ch == 'c')
             {
-                SeleccionaOperacion(tab, act, ori);
+                SeleccionaOperacion(tab, act, ref ori);
             }
         }
 
         //Método aux que define si hay que eliminar un rectángulo o añadirlo
-        static void SeleccionaOperacion(Tablero tab, Coor act, Coor ori)
+        static void SeleccionaOperacion(Tablero tab, Coor act, ref Coor ori)
         {
             //Comprobaremos si la coordenada seleccionada está dentro de alguno de los rectángulos ya existentes.
             for (int i = 0; i < tab.rects.Length; i++)
@@ -338,7 +342,8 @@ namespace shikaku
                 if (!EliminaRect(tab, act))
                 {
                     //Y si no, es que no hay rectángulo, y lo inserta.
-                    InsertaRect(tab, act, ori); 
+                    InsertaRect(tab, act, ori);
+                    ori = act;
                 }
             }
         }
