@@ -1,8 +1,5 @@
 ﻿//Denisa Juarranz Berindea
 
-using System.Diagnostics.Contracts;
-using System.Runtime.CompilerServices;
-
 namespace shikaku
 {
     class Program
@@ -295,7 +292,6 @@ namespace shikaku
 
         }
         #endregion
-
 
         #region Input
 
