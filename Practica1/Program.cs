@@ -242,7 +242,7 @@ namespace shikaku
             }
         }
 
-        bool EliminaRect(Tablero tab, Coor c)
+        static bool EliminaRect(Tablero tab, Coor c)
         {
             //Daremos por hecho que al inicio esa coordenada no está en ningún rectángulo
             bool encontrada = false;
@@ -258,8 +258,17 @@ namespace shikaku
                 encontrada = false;
             }
 
+            //Falta eliminar el rectángulo
             if (Dentro(c, tab.rects[i]))
             {
+                //Elimina el rectángulo
+                for (int j = i; j < tab.rects.Length - 1; j++)
+                {
+                    Rect aux = tab.rects[j + 1];
+                    tab.rects[j] = aux;
+                }
+                tab.numRects--;
+                //Devuelve true
                 encontrada = true;
             }
 
@@ -315,7 +324,22 @@ namespace shikaku
             }
             else if (ch == 'c')
             {
+                SeleccionaOperacion(tab, act, ori);
+            }
+        }
 
+        //Método aux que define si hay que eliminar un rectángulo o añadirlo
+        static void SeleccionaOperacion(Tablero tab, Coor act, Coor ori)
+        {
+            //Comprobaremos si la coordenada seleccionada está dentro de alguno de los rectángulos ya existentes.
+            for (int i = 0; i < tab.rects.Length; i++)
+            {
+                //Si la encuentra es que hay que borrar ese rectángulo
+                if (!EliminaRect(tab, act))
+                {
+                    //Y si no, es que no hay rectángulo, y lo inserta.
+                    InsertaRect(tab, act, ori); 
+                }
             }
         }
 
