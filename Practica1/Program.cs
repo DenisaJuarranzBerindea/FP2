@@ -225,7 +225,15 @@ namespace shikaku
                 Console.Write("---");
                 Console.SetCursorPosition(r.lt.x + i + 1, r.rb.y + 2);
                 Console.Write("---");
+            }
 
+            //Vertical
+            for (int i = 0; i <= (r.rb.y - r.lt.y); i += 2)
+            {
+                Console.SetCursorPosition(r.lt.x, r.lt.y + 1 + i);
+                Console.Write("|");
+                Console.SetCursorPosition(r.rb.x + 4, r.lt.y + 1 + i);
+                Console.Write("|");
             }
 
 
