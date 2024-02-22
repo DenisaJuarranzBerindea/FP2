@@ -51,7 +51,7 @@ namespace shikaku
 
             while(true)
             {
-                ProcesaInput(LeeInput(), tablero, ref act, ori);
+                ProcesaInput(LeeInput(), ref tablero, ref act, ref ori);
                 Render(tablero, act, ori);
             }
         }
@@ -116,7 +116,7 @@ namespace shikaku
 
         static Rect NormalizaRect(Coor c1, Coor c2)
         {
-            Rect rect = new Rect();
+            Rect rect;
 
             if (c1.x < c2.x)
             { 
@@ -185,8 +185,7 @@ namespace shikaku
             }
 
             //Rectángulos en curso
-            Rect actual = new Rect();
-            actual = NormalizaRect(act, ori);
+            Rect actual = NormalizaRect(act, ori);
             Console.ForegroundColor = ConsoleColor.Green;
             RenderRect(actual);
 
@@ -207,10 +206,12 @@ namespace shikaku
             {
                 if ((r.rb.y - r.lt.y) % 2 != 0) //Horizontal
                 {
+                    Console.SetCursorPosition(1 + r.lt.x * 4, 1 + r.lt.y * 2);
                     Console.WriteLine(" ---");
                 }
                 else //Vertical
                 {
+                    Console.SetCursorPosition(r.lt.x, 1 + r.lt.y * 2);
                     Console.WriteLine("|");
                 }
             }
@@ -221,26 +222,32 @@ namespace shikaku
         #region Lógica Rectángulos
         static bool Dentro(Coor c, Rect r)
         {
-            return (c.x >= r.lt.x || c.x <= r.rb.x) && (c.y >= r.lt.y || c.y <= r.rb.y);
+            return c.x >= r.lt.x && c.x <= r.rb.x && c.y >= r.lt.y && c.y <= r.rb.y;
         }
 
         static bool Intersect(Rect r1, Rect r2)
         {
-            return (Dentro(r1.lt, r2) && Dentro(r1.rb, r2) && Dentro(r2.lt, r1) && Dentro(r2.rb, r1));
+            return Dentro(r1.lt, r2) && Dentro(r1.rb, r2) && Dentro(r2.lt, r1) && Dentro(r2.rb, r1);
         }
 
-        static void InsertaRect(Tablero tab, Coor c1, Coor c2)
+        static void InsertaRect(ref Tablero tab, Coor c1, Coor c2)
         {
+            Rect r = NormalizaRect(c1, c2);
+
             //Comprobamos si el nuevo rectángulo, normalizado, solapa con alguno ya existente
-            for (int i = 0; i < tab.rects.Length; i++)
+            int i = 0;
+            while (i < tab.rects.Length && Intersect(r, tab.rects[i]))
             {
-                //Si no interseca con ninguno, se añade al array de rectángulos
-                if (!Intersect(NormalizaRect(c1, c2), tab.rects[i]))
-                {
-                    tab.rects[tab.numRects] = NormalizaRect(c1, c2);
-                    tab.numRects++;
-                }
+                i++;
             }
+
+            //Si no interseca con ninguno, se añade al array de rectángulos
+            if (!Intersect(r, tab.rects[i])) 
+            {
+                tab.numRects++;
+                tab.rects[tab.numRects - 1] = r;
+            }
+                    
         }
 
         static bool EliminaRect(Tablero tab, Coor c)
@@ -291,9 +298,9 @@ namespace shikaku
         {
             if (debug) 
             {
-                Console.WriteLine("Act: (" + act.x / 4 + "," + act.y / 2 + ")   Ori: (" + ori.x + "," + ori.y + ")");
+                Console.WriteLine("Act: (" + act.x / 4 + "," + act.y / 2 + ")   Ori: (" + ori.x / 4 + "," + ori.y / 2 + ")");
 
-                Console.WriteLine("n Rectángulos: " + tab.numRects);
+                //Console.WriteLine("n Rectángulos: " + tab.numRects);
 
                 //Console.WriteLine("Pilares: ");
                 //for (int i = 0; i < tab.pils.Length; i++)
@@ -305,19 +312,15 @@ namespace shikaku
                 Console.WriteLine("Rectángulos: ");
                 for (int i = 0; i < tab.numRects; i++)
                 {
-                    Console.WriteLine("Coordenadas: ( (" + tab.rects[i].lt.x + ", " + tab.rects[i].lt.y + ") - (" + tab.rects[i].rb.x + ", " + tab.rects[i].rb.y + ") )");
+                    Console.WriteLine("Coordenadas: ( (" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ") )");
                 }
-
-                
-
             }
-
         }
         #endregion
 
         #region Input
 
-        static void ProcesaInput(char ch, Tablero tab, ref Coor act, Coor ori)
+        static void ProcesaInput(char ch, ref Tablero tab, ref Coor act, ref Coor ori)
         {
             if (ch == 'l' && act.x > 2) //Izquierda
             {
@@ -335,25 +338,28 @@ namespace shikaku
             {
                 act.y += 2;
             }
-            else if (ch == 'c')
+            else if (ch == 'c' && ori.x == -1) //Rectángulos
             {
-                SeleccionaOperacion(tab, act, ref ori);
+                ori = act;
+            }
+            else if (ch == 'c' && ori.x != -1)
+            {
+                InsertaRect(ref tab, ori, act);
             }
         }
+
+        //Metodo aux para definir si se ha pulsado ya o no 
 
         //Método aux que define si hay que eliminar un rectángulo o añadirlo
         static void SeleccionaOperacion(Tablero tab, Coor act, ref Coor ori)
         {
             //Comprobaremos si la coordenada seleccionada está dentro de alguno de los rectángulos ya existentes.
-            for (int i = 0; i < tab.rects.Length; i++)
+            //Si la encuentra es que hay que borrar ese rectángulo
+            if (!EliminaRect(tab, act))
             {
-                //Si la encuentra es que hay que borrar ese rectángulo
-                if (!EliminaRect(tab, act))
-                {
-                    //Y si no, es que no hay rectángulo, y lo inserta.
-                    InsertaRect(tab, act, ori);
-                    ori = act;
-                }
+                ori = act;
+                //Y si no, es que no hay rectángulo, y lo inserta.
+                InsertaRect(ref tab, act, ori);
             }
         }
 
