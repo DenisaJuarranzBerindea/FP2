@@ -1,5 +1,7 @@
 ﻿//Denisa Juarranz Berindea
 
+using System.Reflection.Metadata;
+
 namespace shikaku
 {
     class Program
@@ -117,10 +119,13 @@ namespace shikaku
         static Rect NormalizaRect(Coor c1, Coor c2)
         {
             Rect rect;
+            //Daremos por hecho que está normalizado, y luego lo modificaremos si es necesario
+            rect.lt = c1;
+            rect.rb = c2;
 
-            if (c1.x < c2.x)
+            if (c1.x <= c2.x)
             { 
-                if (c1.y > c2.y) 
+                if (c1.y <= c2.y) 
                 {
                     rect.lt = c1;
                     rect.rb = c2;
@@ -137,7 +142,7 @@ namespace shikaku
             }
             else
             {
-                if (c2.y > c1.y)
+                if (c2.y >= c1.y)
                 {
                     rect.lt = c2;
                     rect.rb = c1;
@@ -184,10 +189,10 @@ namespace shikaku
                 RenderRect(tab.rects[i]);
             }
 
-            //Rectángulos en curso
-            Rect actual = NormalizaRect(act, ori);
-            Console.ForegroundColor = ConsoleColor.Green;
-            RenderRect(actual);
+            ////Rectángulos en curso
+            //Rect actual = NormalizaRect(act, ori);
+            //Console.ForegroundColor = ConsoleColor.Green;
+            //RenderRect(actual);
 
             Console.ForegroundColor = ConsoleColor.White;
             //Información de Debug
@@ -202,19 +207,29 @@ namespace shikaku
         //Método Auxiliar para dibujar rectángulos
         static void RenderRect(Rect r)
         {
-            for(int i = 0; i < (r.rb.x - r.lt.x); i++)
+            //if ((r.rb.y - r.lt.y) % 2 != 0) //Horizontal
+            //{
+            //    Console.SetCursorPosition(1 + r.lt.x * 4, 1 + r.lt.y * 2);
+            //    Console.WriteLine(" ---");
+            //}
+            //else //Vertical
+            //{
+            //    Console.SetCursorPosition(r.lt.x, 1 + r.lt.y * 2);
+            //    Console.WriteLine("|");
+            //}
+
+            //Horizontal
+            for (int i = 0; i <= (r.rb.x - r.lt.x); i += 4) 
             {
-                if ((r.rb.y - r.lt.y) % 2 != 0) //Horizontal
-                {
-                    Console.SetCursorPosition(1 + r.lt.x * 4, 1 + r.lt.y * 2);
-                    Console.WriteLine(" ---");
-                }
-                else //Vertical
-                {
-                    Console.SetCursorPosition(r.lt.x, 1 + r.lt.y * 2);
-                    Console.WriteLine("|");
-                }
+                Console.SetCursorPosition(r.lt.x + i + 1, r.lt.y);
+                Console.Write("---");
+                Console.SetCursorPosition(r.lt.x + i + 1, r.rb.y + 2);
+                Console.Write("---");
+
             }
+
+
+            
         }
 
         #endregion
@@ -312,7 +327,7 @@ namespace shikaku
                 Console.WriteLine("Rectángulos: ");
                 for (int i = 0; i < tab.numRects; i++)
                 {
-                    Console.WriteLine("Coordenadas: ( (" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ") )");
+                    Console.WriteLine("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ")");
                 }
             }
         }
@@ -345,6 +360,7 @@ namespace shikaku
             else if (ch == 'c' && ori.x != -1)
             {
                 InsertaRect(ref tab, ori, act);
+                ori.x = -1;
             }
         }
 
