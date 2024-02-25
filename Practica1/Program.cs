@@ -108,6 +108,13 @@ namespace shikaku
 
             //Creamos el array de rectángulos
             tab.rects = new Rect[tab.fils * tab.cols];
+            for (int j = 0; j < tab.rects.Length; j++)
+            {
+                tab.rects[j].lt.x = -1;
+                tab.rects[j].lt.y = -1;
+                tab.rects[j].rb.x = -1;
+                tab.rects[j].rb.x = -1;
+            }
 
             //Inicialmente no hay ningún rectángulo
             tab.numRects = 0;
@@ -125,7 +132,7 @@ namespace shikaku
 
             if (c1.x <= c2.x)
             { 
-                if (c1.y <= c2.y) 
+                if (c1.y <= c2.y)
                 {
                     rect.lt = c1;
                     rect.rb = c2;
@@ -138,22 +145,21 @@ namespace shikaku
                     rect.rb.x = c2.x;
                     rect.rb.y = c1.y;
                 }
-
             }
             else
             {
-                if (c2.y >= c1.y)
+                if (c1.y <= c2.y)
                 {
-                    rect.lt = c2;
-                    rect.rb = c1;
+                    rect.lt.x = c2.x;
+                    rect.lt.y = c1.y;
+
+                    rect.rb.x = c1.x;
+                    rect.rb.y = c2.y;
                 }
                 else
                 {
-                    rect.lt.x = c1.x;
-                    rect.lt.y = c2.y;
-
-                    rect.rb.x = c2.x;
-                    rect.rb.y = c1.y;
+                    rect.lt = c2;
+                    rect.rb = c1;
                 }
             }
 
@@ -163,6 +169,8 @@ namespace shikaku
         static void Render(Tablero tab, Coor act, Coor ori)
         {
             Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.White;
 
             //Tablero Vacío
             for (int i = 0; i < tab.fils + 1; i++) 
@@ -241,16 +249,38 @@ namespace shikaku
 
         static bool Intersect(Rect r1, Rect r2)
         {
-            return Dentro(r1.lt, r2) && Dentro(r1.rb, r2) && Dentro(r2.lt, r1) && Dentro(r2.rb, r1);
+            bool intersect = false;
+
+            //Recorremos todas las coordenadas del rectángulo 1
+            int i = r1.lt.y;
+            while (i < r1.rb.y + 1 && !intersect) //filas
+            {
+                int j = r1.lt.x;
+                while (j < r1.rb.x + 1 && !intersect) //columnas
+                {
+                    Coor coor;
+                    coor.x = j;
+                    coor.y = i;
+                    if (Dentro(coor, r2)) //Comprobamos si esa coordenada está dentro del otro
+                    {
+                        intersect = true;
+                    }
+
+                    j++;
+                }
+
+                i++;
+            }
+
+            return intersect;
         }
 
         static void InsertaRect(ref Tablero tab, Coor c1, Coor c2)
         {
             Rect r = NormalizaRect(c1, c2);
-
             //Comprobamos si el nuevo rectángulo, normalizado, solapa con alguno ya existente
             int i = 0;
-            while (i < tab.rects.Length && Intersect(r, tab.rects[i]))
+            while (i < tab.numRects && !Intersect(r, tab.rects[i]))
             {
                 i++;
             }
