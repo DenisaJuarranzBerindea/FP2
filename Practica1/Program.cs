@@ -202,7 +202,8 @@ namespace shikaku
             //Rectángulos ya marcados
             for (int i = 0; i < tab.rects.Length; i++)
             {
-                if (tab.rects[i].rb.x != 0 && tab.rects[i].rb.y != 0)
+                //Evitamos que pinte los rectángulos del array vacío
+                if (tab.rects[i].lt.x >= 0 && tab.rects[i].lt.y >= 0)
                 {
                     RenderRect(tab.rects[i]);
                 }
@@ -438,7 +439,10 @@ namespace shikaku
             }
             else if (ch == 'c' && ori.x == -1) //Rectángulos
             {
-                ori = act;
+                if (!EliminaRect(tab, act))
+                {
+                    ori = act;
+                }
             }
             else if (ch == 'c' && ori.x != -1)
             {
