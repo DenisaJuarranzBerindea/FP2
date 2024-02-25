@@ -207,17 +207,6 @@ namespace shikaku
         //Método Auxiliar para dibujar rectángulos
         static void RenderRect(Rect r)
         {
-            //if ((r.rb.y - r.lt.y) % 2 != 0) //Horizontal
-            //{
-            //    Console.SetCursorPosition(1 + r.lt.x * 4, 1 + r.lt.y * 2);
-            //    Console.WriteLine(" ---");
-            //}
-            //else //Vertical
-            //{
-            //    Console.SetCursorPosition(r.lt.x, 1 + r.lt.y * 2);
-            //    Console.WriteLine("|");
-            //}
-
             //Horizontal
             for (int i = 0; i <= (r.rb.x - r.lt.x); i += 4) 
             {
@@ -235,9 +224,6 @@ namespace shikaku
                 Console.SetCursorPosition(r.rb.x + 4, r.lt.y + 1 + i);
                 Console.Write("|");
             }
-
-
-            
         }
 
         #endregion
