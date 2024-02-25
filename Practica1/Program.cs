@@ -369,28 +369,26 @@ namespace shikaku
             bool coincide = false;
 
             //Busca un pilar dentro del rectángulo
-            int pilares = 0;
+            int pilares = 0; int indice = 0;
             int i = 0;
-
+            
             while (i < p.Length && pilares <= 1)
             {
                 //Si está dentro, sumará el número de pilares y almacenaremos su índice
                 if (Dentro(p[i].coor, r))
                 {
+                    indice = i;
                     pilares++;
                 }
+
                 i++;
             }
 
-            if (i >= p.Length)
-            {
-                coincide = false;
-            }
             //Si después de todo, solo hay un pilar
-            else if (pilares == 1)
+            if (pilares == 1)
             {
                 //Comprobamos el área del rectángulo
-                if (p[i].val == AreaRect(r))
+                if (p[indice].val == AreaRect(r))
                 {
                     coincide = true;
                 }
@@ -480,7 +478,8 @@ namespace shikaku
                     //Evitamos que pinte los rectángulos del array vacío
                     if (tab.rects[i].lt.x >= 0 && tab.rects[i].lt.y >= 0)
                     {
-                        Console.WriteLine("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ") Area: " + AreaRect(tab.rects[i]));
+                        Console.WriteLine("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ") Area: " 
+                        + AreaRect(tab.rects[i]) + " Correcto: " + CheckRect(tab.rects[i], tab.pils));
 
                     }
                 }
