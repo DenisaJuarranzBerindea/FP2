@@ -312,7 +312,7 @@ namespace shikaku
             }
 
             //Falta eliminar el rectángulo
-            if (Dentro(c, tab.rects[i]))
+            if (i < tab.rects.Length && Dentro(c, tab.rects[i]))
             {
                 //Elimina el rectángulo
                 for (int j = i; j < tab.rects.Length - 1; j++)
@@ -411,7 +411,11 @@ namespace shikaku
                 Console.WriteLine("Rects: ");
                 for (int i = 0; i < tab.numRects; i++)
                 {
-                    Console.Write("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ")");
+                    //Evitamos que pinte los rectángulos del array vacío
+                    if (tab.rects[i].lt.x >= 0 && tab.rects[i].lt.y >= 0)
+                    {
+                        Console.Write("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ")");
+                    }
                 }
             }
         }
