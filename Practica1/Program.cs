@@ -183,18 +183,23 @@ namespace shikaku
                 Console.Write(tab.pils[i].val);
             }
 
+            //Rectángulos en curso
+            if (ori.x != -1)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                RenderRect(NormalizaRect(ori, act));
+            }
+            Console.ForegroundColor = ConsoleColor.White;
+
             //Rectángulos ya marcados
             for (int i = 0; i < tab.rects.Length; i++)
             {
-                RenderRect(tab.rects[i]);
+                if (tab.rects[i].rb.x != 0 && tab.rects[i].rb.y != 0)
+                {
+                    RenderRect(tab.rects[i]);
+                }
             }
 
-            ////Rectángulos en curso
-            //Rect actual = NormalizaRect(act, ori);
-            //Console.ForegroundColor = ConsoleColor.Green;
-            //RenderRect(actual);
-
-            Console.ForegroundColor = ConsoleColor.White;
             //Información de Debug
             Console.SetCursorPosition(0, tab.fils * 2 + 2);
             Debug(tab, DEBUG, ori, act);
@@ -208,7 +213,7 @@ namespace shikaku
         static void RenderRect(Rect r)
         {
             //Horizontal
-            for (int i = 0; i <= (r.rb.x - r.lt.x); i += 4) 
+            for (int i = 0; i <= (r.rb.x - r.lt.x); i += 4)
             {
                 Console.SetCursorPosition(r.lt.x + i + 1, r.lt.y);
                 Console.Write("---");
@@ -300,6 +305,60 @@ namespace shikaku
             return (r.rb.x - r.lt.x) * (r.rb.y - r.lt.y);
         }
 
+        static bool CheckRect(Rect r, Pilar[] p)
+        {
+            //Daremos por hecho que inicialmente el rectángulo no es correcto
+            bool coincide = false;
+
+            //Busca un pilar dentro del rectángulo
+            int pilares = 0;
+            int i = 0;
+
+            while (i < p.Length && pilares <= 1) 
+            { 
+                //Si está dentro, sumará el número de pilares y almacenaremos su índice
+                if (Dentro(p[i].coor, r))
+                {
+                    pilares++;
+                }
+                i++;
+            }
+
+            //Si después de todo, solo hay un pilar
+            if (pilares == 1)
+            {
+                //Comprobamos el área del rectángulo
+                if (p[i].val == AreaRect(r))
+                {
+                    coincide = true;
+                }
+            }
+
+            return coincide;
+        }
+
+        static bool FinJuego(Tablero tab)
+        {
+            //Daremos por hecho que inicialmente no se ha terminado
+            bool fin = false;
+
+            //Buscamos algún rectángulo que no cumpla con las condiciones
+            int i = 0;
+            while (i < tab.rects.Length && CheckRect(tab.rects[i], tab.pils))
+            {
+                i++;
+            }
+
+            //Si a llegado al final, es porque todos los rectángulos son correctos
+            if (i == tab.rects.Length)
+            {
+                fin = true;
+            }
+            //Si algún rectángulo no es correcto, fin se mantiene en false
+           
+            return fin;
+        }
+
         #endregion
 
         #region DEBUG
@@ -318,10 +377,10 @@ namespace shikaku
                 //    Console.WriteLine("Coordenadas: (" + tab.pils[i].coor.x + ", " + tab.pils[i].coor.y + ")");
                 //}
 
-                Console.WriteLine("Rectángulos: ");
+                Console.WriteLine("Rects: ");
                 for (int i = 0; i < tab.numRects; i++)
                 {
-                    Console.WriteLine("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ")");
+                    Console.Write("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ")");
                 }
             }
         }
@@ -355,21 +414,6 @@ namespace shikaku
             {
                 InsertaRect(ref tab, ori, act);
                 ori.x = -1;
-            }
-        }
-
-        //Metodo aux para definir si se ha pulsado ya o no 
-
-        //Método aux que define si hay que eliminar un rectángulo o añadirlo
-        static void SeleccionaOperacion(Tablero tab, Coor act, ref Coor ori)
-        {
-            //Comprobaremos si la coordenada seleccionada está dentro de alguno de los rectángulos ya existentes.
-            //Si la encuentra es que hay que borrar ese rectángulo
-            if (!EliminaRect(tab, act))
-            {
-                ori = act;
-                //Y si no, es que no hay rectángulo, y lo inserta.
-                InsertaRect(ref tab, act, ori);
             }
         }
 
