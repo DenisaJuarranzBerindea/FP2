@@ -62,6 +62,8 @@ namespace shikaku
             string nivel = Console.ReadLine();
             while (JuegaNivel("puzzles/" + nivel + ".txt"))
             {
+                Console.Clear();
+                Console.WriteLine("Bien hecho :)");
                 Console.WriteLine("Inserte un nivel para jugar");
                 //Leemos el nivel de teclado
                 Console.WriteLine("Nivel: XXX");
@@ -355,10 +357,10 @@ namespace shikaku
             //Como mínimo será 1
             int area = 1;
 
-            if ((r.rb.x - r.lt.x)/4 == 0 && (r.rb.y - r.lt.y)/2 != 0) { area = (r.rb.y - r.lt.y) / 2 + 1; }
-            else if ((r.rb.x - r.lt.x)/4 != 0 && (r.rb.y - r.lt.y)/2 == 0) { area = (r.rb.x - r.lt.x)/4 + 1; }
-            else if ((r.rb.x - r.lt.x)/4 == 0 && (r.rb.y - r.lt.y)/2 == 0) { area = 1; }
-            else if ((r.rb.x - r.lt.x)/4 != 0 && (r.rb.y - r.lt.y)/2 != 0) { area = (r.rb.x - r.lt.x)/4 + 2 * (r.rb.y - r.lt.y)/2 + 1; }
+            if ((r.rb.x - r.lt.x) == 0 && (r.rb.y - r.lt.y) != 0) { area = (r.rb.y - r.lt.y) + 1; }
+            else if ((r.rb.x - r.lt.x) != 0 && (r.rb.y - r.lt.y) == 0) { area = (r.rb.x - r.lt.x) + 1; }
+            else if ((r.rb.x - r.lt.x) == 0 && (r.rb.y - r.lt.y) == 0) { area = 1; }
+            else if ((r.rb.x - r.lt.x) != 0 && (r.rb.y - r.lt.y) != 0) { area = (r.rb.x - r.lt.x) + 2 * (r.rb.y - r.lt.y)+ 1; }
 
             return area;
         }
@@ -371,8 +373,13 @@ namespace shikaku
             //Busca un pilar dentro del rectángulo
             int pilares = 0; int indice = 0;
             int i = 0;
-            
-            while (i < p.Length && pilares <= 1)
+
+            r.lt.x = r.lt.x/4;
+            r.lt.y = r.lt.y/2;
+            r.rb.x = r.rb.x/4;
+            r.rb.y = r.rb.y/2;
+
+            while (i < p.Length && pilares < 2)
             {
                 //Si está dentro, sumará el número de pilares y almacenaremos su índice
                 if (Dentro(p[i].coor, r))
@@ -391,6 +398,7 @@ namespace shikaku
                 if (p[indice].val == AreaRect(r))
                 {
                     coincide = true;
+
                 }
             }
 
@@ -404,13 +412,13 @@ namespace shikaku
 
             //Buscamos algún rectángulo que no cumpla con las condiciones
             int i = 0;
-            while (i < tab.rects.Length && CheckRect(tab.rects[i], tab.pils))
+            while (i < tab.pils.Length && CheckRect(tab.rects[i], tab.pils))
             {
                 i++;
             }
 
             //Si a llegado al final, es porque todos los rectángulos son correctos
-            if (i == tab.rects.Length)
+            if (i == tab.pils.Length)
             {
                 fin = true;
             }
@@ -478,8 +486,8 @@ namespace shikaku
                     //Evitamos que pinte los rectángulos del array vacío
                     if (tab.rects[i].lt.x >= 0 && tab.rects[i].lt.y >= 0)
                     {
-                        Console.WriteLine("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ") Area: " 
-                        + AreaRect(tab.rects[i]) + " Correcto: " + CheckRect(tab.rects[i], tab.pils));
+                        Console.Write("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 +
+                            ")")/* "Correcto: " + CheckRect(tab.rects[i], tab.pils))*/;
 
                     }
                 }
