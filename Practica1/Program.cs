@@ -9,23 +9,23 @@ namespace shikaku
         const bool DEBUG = true;
 
         struct Coor //Coordenadas en el tablero 
-        { 
+        {
             public int x, y;
         }
 
         struct Pilar //Pilar en el tablero
-        { 
+        {
             public Coor coor;   // posición en el tablero
             public int val;     // valor
-        } 
+        }
 
         struct Rect //Rectángulo determinado por dos esquinas
-        {  
+        {
             public Coor lt, rb; // left-top, right-bottom
-        }  
+        }
 
         struct Tablero //Tamaño, pilares, rectángulos marcados
-        { 
+        {
             public int fils, cols;  // num fils y cols del tablero   
             public Pilar[] pils;    // array de pilares
             public Rect[] rects;    // array de rectángulos
@@ -35,35 +35,54 @@ namespace shikaku
         static void Main()
         {
             Tablero tablero = new Tablero();
-            Coor ori = new Coor();
+            Coor ori;
             ori.x = -1; //Si no hay rectangulo
-            Coor act = new Coor();
+            ori.y = 0;
+            Coor act;
+            act.x = 0;
+            act.y = 0;
 
-            ////Leemos el nivel de teclado
-            //Console.WriteLine("Nivel: XXX");
-            //string nivel = Console.ReadLine();
-            //Console.WriteLine();
-            //LeeNivel("puzzles/" + nivel + ".txt", out tablero);
+            ////Testing con nivel 000
+            //LeeNivel("puzzles/000.txt", out tablero);
 
-            LeeNivel("puzzles/000.txt", out tablero);
+            //Debug(tablero, DEBUG, ori, act);
+            //Render(tablero, act, ori);
+            //char c = ' ';
 
-            Debug(tablero, DEBUG, ori, act);
+            //while (c != 'q')
+            //{
+            //    c = LeeInput();
+            //    ProcesaInput(c, ref tablero, ref act, ref ori);
+            //    Render(tablero, act, ori);
+            //}
 
-            Render(tablero, act, ori);
-
-            while(true)
+            Console.WriteLine("Inserte un nivel para jugar");
+            //Leemos el nivel de teclado
+            Console.WriteLine("Nivel: XXX");
+            string nivel = Console.ReadLine();
+            while (JuegaNivel("puzzles/" + nivel + ".txt"))
             {
-                ProcesaInput(LeeInput(), ref tablero, ref act, ref ori);
-                Render(tablero, act, ori);
+                Console.WriteLine("Inserte un nivel para jugar");
+                //Leemos el nivel de teclado
+                Console.WriteLine("Nivel: XXX");
+                nivel = Console.ReadLine();
             }
+
+            //Si se aborta la partida (LeeInput() == 'q')
+            if (!JuegaNivel("puzzles/" + nivel + ".txt"))
+            {
+                Console.WriteLine("Gracias por jugar");
+            }
+
+
         }
 
         #region Render Nivel
 
-        static void LeeNivel (string file, out Tablero tab)
+        static void LeeNivel(string file, out Tablero tab)
         {
             //Abrimos flujo de lectura
-            StreamReader nivel = new StreamReader (file);
+            StreamReader nivel = new StreamReader(file);
 
             //Leemos la dimensión del tablero
             tab.fils = int.Parse(nivel.ReadLine());
@@ -82,7 +101,7 @@ namespace shikaku
                 string[] fila = nivel.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
                 //Recorremos la fila, buscando pilares
-                for (int j = 0; j < fila.Length; j++) 
+                for (int j = 0; j < fila.Length; j++)
                 {
                     //Si hay pilares, aumentaremos el tamaño del array final y rellenamos el auxiliar
                     if (fila[j] != "-")
@@ -101,7 +120,7 @@ namespace shikaku
 
             //Ahora, rellenamos pils en su tamaño real
             tab.pils = new Pilar[tamanoPils];
-            for (int j = 0; j < tab.pils.Length; j++) 
+            for (int j = 0; j < tab.pils.Length; j++)
             {
                 tab.pils[j] = pilarAux[j];
             }
@@ -131,7 +150,7 @@ namespace shikaku
             rect.rb = c2;
 
             if (c1.x <= c2.x)
-            { 
+            {
                 if (c1.y <= c2.y)
                 {
                     rect.lt = c1;
@@ -165,7 +184,7 @@ namespace shikaku
 
             return rect;
         }
-      
+
         static void Render(Tablero tab, Coor act, Coor ori)
         {
             Console.Clear();
@@ -173,13 +192,13 @@ namespace shikaku
             Console.ForegroundColor = ConsoleColor.White;
 
             //Tablero Vacío
-            for (int i = 0; i < tab.fils + 1; i++) 
-            { 
-                for (int j = 0; j < tab.cols + 1; j++) 
+            for (int i = 0; i < tab.fils + 1; i++)
+            {
+                for (int j = 0; j < tab.cols + 1; j++)
                 {
                     Console.Write("+   ");
                 }
-            
+
                 Console.WriteLine();
                 Console.WriteLine();
             }
@@ -287,12 +306,12 @@ namespace shikaku
             }
 
             //Si no interseca con ninguno, se añade al array de rectángulos
-            if (!Intersect(r, tab.rects[i])) 
+            if (!Intersect(r, tab.rects[i]))
             {
                 tab.numRects++;
                 tab.rects[tab.numRects - 1] = r;
             }
-                    
+
         }
 
         static bool EliminaRect(Tablero tab, Coor c)
@@ -301,7 +320,7 @@ namespace shikaku
             bool encontrada = false;
             //Buscamos la coordenada entre los rectángulos del tablero
             int i = 0;
-            while (i < tab.rects.Length && !Dentro(c, tab.rects[i])) 
+            while (i < tab.rects.Length && !Dentro(c, tab.rects[i]))
             {
                 i++;
             }
@@ -333,7 +352,15 @@ namespace shikaku
 
         static int AreaRect(Rect r)
         {
-            return (r.rb.x - r.lt.x) * (r.rb.y - r.lt.y);
+            //Como mínimo será 1
+            int area = 1;
+
+            if ((r.rb.x - r.lt.x)/4 == 0 && (r.rb.y - r.lt.y)/2 != 0) { area = (r.rb.y - r.lt.y) / 2 + 1; }
+            else if ((r.rb.x - r.lt.x)/4 != 0 && (r.rb.y - r.lt.y)/2 == 0) { area = (r.rb.x - r.lt.x)/4 + 1; }
+            else if ((r.rb.x - r.lt.x)/4 == 0 && (r.rb.y - r.lt.y)/2 == 0) { area = 1; }
+            else if ((r.rb.x - r.lt.x)/4 != 0 && (r.rb.y - r.lt.y)/2 != 0) { area = (r.rb.x - r.lt.x)/4 + 2 * (r.rb.y - r.lt.y)/2 + 1; }
+
+            return area;
         }
 
         static bool CheckRect(Rect r, Pilar[] p)
@@ -345,8 +372,8 @@ namespace shikaku
             int pilares = 0;
             int i = 0;
 
-            while (i < p.Length && pilares <= 1) 
-            { 
+            while (i < p.Length && pilares <= 1)
+            {
                 //Si está dentro, sumará el número de pilares y almacenaremos su índice
                 if (Dentro(p[i].coor, r))
                 {
@@ -355,8 +382,12 @@ namespace shikaku
                 i++;
             }
 
+            if (i >= p.Length)
+            {
+                coincide = false;
+            }
             //Si después de todo, solo hay un pilar
-            if (pilares == 1)
+            else if (pilares == 1)
             {
                 //Comprobamos el área del rectángulo
                 if (p[i].val == AreaRect(r))
@@ -386,10 +417,45 @@ namespace shikaku
                 fin = true;
             }
             //Si algún rectángulo no es correcto, fin se mantiene en false
-           
+
             return fin;
         }
 
+        static bool JuegaNivel(string file)
+        {
+            //Daremos por hecho que inicialmente no se ha superado el nivel
+            bool superado = false;
+
+            //Inicializamos
+            Tablero tablero = new Tablero();
+            Coor ori;
+            ori.x = -1; //Si no hay rectangulo         
+            ori.y = 0;
+            Coor act;
+            act.x = 0; act.y = 0;
+
+            LeeNivel(file, out tablero);
+            Render(tablero, act, ori);
+            char c = ' ';
+
+            while (!FinJuego(tablero) && c != 'q')
+            {
+                c = LeeInput();
+                ProcesaInput(c, ref tablero, ref act, ref ori);
+                Render(tablero, act, ori);
+            }
+
+            if (FinJuego(tablero))
+            {
+                superado = true;
+            }
+            else if (LeeInput() == 'q')
+            {
+                superado = false;
+            }
+
+            return superado;
+        }
         #endregion
 
         #region DEBUG
@@ -414,7 +480,8 @@ namespace shikaku
                     //Evitamos que pinte los rectángulos del array vacío
                     if (tab.rects[i].lt.x >= 0 && tab.rects[i].lt.y >= 0)
                     {
-                        Console.Write("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ")");
+                        Console.WriteLine("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 + ") Area: " + AreaRect(tab.rects[i]));
+
                     }
                 }
             }
