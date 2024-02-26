@@ -221,7 +221,7 @@ namespace shikaku
             Console.ForegroundColor = ConsoleColor.White;
 
             //Rectángulos ya marcados
-            for (int i = 0; i < tab.rects.Length; i++)
+            for (int i = 0; i < tab.numRects; i++)
             {
                 //Evitamos que pinte los rectángulos del array vacío
                 if (tab.rects[i].lt.x >= 0 && tab.rects[i].lt.y >= 0)
@@ -310,13 +310,13 @@ namespace shikaku
             //Si no interseca con ninguno, se añade al array de rectángulos
             if (!Intersect(r, tab.rects[i]))
             {
+                tab.rects[tab.numRects] = r;
                 tab.numRects++;
-                tab.rects[tab.numRects - 1] = r;
             }
 
         }
 
-        static bool EliminaRect(Tablero tab, Coor c)
+        static bool EliminaRect(ref Tablero tab, Coor c)
         {
             //Daremos por hecho que al inicio esa coordenada no está en ningún rectángulo
             bool encontrada = false;
@@ -333,15 +333,24 @@ namespace shikaku
             }
 
             //Falta eliminar el rectángulo
-            if (i < tab.rects.Length && Dentro(c, tab.rects[i]))
+            if (i < tab.numRects && Dentro(c, tab.rects[i]))
             {
                 //Elimina el rectángulo
-                for (int j = i; j < tab.rects.Length - 1; j++)
+                for (int j = i; j < tab.numRects - 1; j++)
                 {
-                    Rect aux = tab.rects[j + 1];
-                    tab.rects[j] = aux;
+                   
+                    tab.rects[j] = tab.rects[j + 1];
                 }
                 tab.numRects--;
+                //if (tab.numRects < 26) 
+                //{
+                //    tab.numRects--;
+                //}
+                //else
+                //{
+                //    tab.numRects = 0;
+                //}
+
                 //Devuelve true
                 encontrada = true;
             }
@@ -471,7 +480,7 @@ namespace shikaku
             {
                 Console.WriteLine("Act: (" + act.x / 4 + "," + act.y / 2 + ")   Ori: (" + ori.x / 4 + "," + ori.y / 2 + ")");
 
-                //Console.WriteLine("n Rectángulos: " + tab.numRects);
+                Console.WriteLine("n Rectángulos: " + tab.numRects);
 
                 //Console.WriteLine("Pilares: ");
                 //for (int i = 0; i < tab.pils.Length; i++)
@@ -517,7 +526,7 @@ namespace shikaku
             }
             else if (ch == 'c' && ori.x == -1) //Rectángulos
             {
-                if (!EliminaRect(tab, act))
+                if (!EliminaRect(ref tab, act))
                 {
                     ori = act;
                 }
