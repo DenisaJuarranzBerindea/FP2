@@ -341,17 +341,9 @@ namespace shikaku
                    
                     tab.rects[j] = tab.rects[j + 1];
                 }
-                tab.numRects--;
-                //if (tab.numRects < 26) 
-                //{
-                //    tab.numRects--;
-                //}
-                //else
-                //{
-                //    tab.numRects = 0;
-                //}
 
-                //Devuelve true
+                tab.numRects--;
+
                 encontrada = true;
             }
 
@@ -480,7 +472,7 @@ namespace shikaku
             {
                 Console.WriteLine("Act: (" + act.x / 4 + "," + act.y / 2 + ")   Ori: (" + ori.x / 4 + "," + ori.y / 2 + ")");
 
-                Console.WriteLine("n Rectángulos: " + tab.numRects);
+                //Console.WriteLine("n Rectángulos: " + tab.numRects);
 
                 //Console.WriteLine("Pilares: ");
                 //for (int i = 0; i < tab.pils.Length; i++)
