@@ -32,6 +32,8 @@ namespace shikaku
             public int numRects;    // num de rectángulos definidos = prim pos libre en rect
         }
 
+        enum Color {Rojo, Azul, Verde, Morado};
+
         static void Main()
         {
             Tablero tablero = new Tablero();
@@ -124,6 +126,7 @@ namespace shikaku
             tab.pils = new Pilar[tamanoPils];
             for (int j = 0; j < tab.pils.Length; j++)
             {
+
                 tab.pils[j] = pilarAux[j];
             }
 
@@ -206,11 +209,13 @@ namespace shikaku
             }
 
             //Pilares, poniendo el número en el centro de la casilla correspondiente.
+            Console.ForegroundColor = ConsoleColor.Yellow;
             for (int i = 0; i < tab.pils.Length; i++)
             {
                 Console.SetCursorPosition(2 + tab.pils[i].coor.x * 4, 1 + tab.pils[i].coor.y * 2);
                 Console.Write(tab.pils[i].val);
             }
+            Console.ForegroundColor = ConsoleColor.White;
 
             //Rectángulos en curso
             if (ori.x != -1)
@@ -494,6 +499,70 @@ namespace shikaku
                 }
             }
         }
+        #endregion
+
+        #region Ampliaciones
+
+        //Define si los dos rectángulos son o no vecinos
+        static bool Vecinos(Rect r1, Rect r2)
+        {
+            //Console.SetCursorPosition(r.lt.x + i + 1, r.lt.y + 1);
+            //Console.BackgroundColor = ConsoleColor.Green;
+            //Console.WriteLine(" ");
+
+
+            //Daremos por hecho que inicialmente no son vecinos
+            bool vecino = false;
+
+            //Recorremos 
+            //Recorremos los bordes del rectángulo 1. Según el lado que sea, sumamos o restamos x o y. Usamos el método Dentro()
+            //Lado superior e inferior
+            for (int i = r1.lt.x; i < r1.rb.x; i++)
+            {
+                Coor c;
+                c.x = i; c.y = r1.lt.y - 1;
+                if (Dentro(c, r2))
+                { 
+                    vecino = true;
+                }
+
+                c.y = r1.rb.y + 1;
+                if (Dentro(c, r2))
+                {
+                    vecino = true;
+                }
+            }
+            //Lado izquierdo y derecho
+            for (int i = r1.lt.y; i < r1.rb.y; i++)
+            {
+                Coor c;
+                c.x = r1.lt.x - 1;
+                c.y = i;
+                if (Dentro(c, r2))
+                {
+                    vecino = true;
+                }
+
+                c.x = r1.rb.x + 1;
+                if (Dentro(c, r2))
+                {
+                    vecino = true;
+                }
+            }
+
+            return vecino;
+        }
+
+        static void BuscaVecinos(Tablero tab)
+        {
+
+        }
+
+        static void Pinta(Rect r, Color color)
+        {
+
+        }
+
         #endregion
 
         #region Input
