@@ -77,8 +77,6 @@ namespace shikaku
             {
                 Console.WriteLine("Gracias por jugar");
             }
-
-
         }
 
         #region Render Nivel
@@ -209,13 +207,11 @@ namespace shikaku
             }
 
             //Pilares, poniendo el número en el centro de la casilla correspondiente.
-            Console.ForegroundColor = ConsoleColor.Yellow;
             for (int i = 0; i < tab.pils.Length; i++)
             {
                 Console.SetCursorPosition(2 + tab.pils[i].coor.x * 4, 1 + tab.pils[i].coor.y * 2);
                 Console.Write(tab.pils[i].val);
             }
-            Console.ForegroundColor = ConsoleColor.White;
 
             //Rectángulos en curso
             if (ori.x != -1)
@@ -486,7 +482,7 @@ namespace shikaku
                 //    Console.WriteLine("Coordenadas: (" + tab.pils[i].coor.x + ", " + tab.pils[i].coor.y + ")");
                 //}
 
-                Console.WriteLine("Rects: ");
+                Console.Write("Rects: ");
                 for (int i = 0; i < tab.numRects; i++)
                 {
                     //Evitamos que pinte los rectángulos del array vacío
@@ -497,6 +493,36 @@ namespace shikaku
 
                     }
                 }
+
+                Console.WriteLine();
+                for (int i = 0; i < tab.numRects; i++)
+                {
+                    Console.WriteLine("Vecinos de rect " + i + ": ");
+                    for (int j = 0; j < tab.numRects; j++)
+                    {
+                        if (VecinoSuperior(tab.rects[i], tab.rects[j]))
+                        {
+                            Console.Write("(Rect " + j + "), ");
+                            Console.WriteLine();
+                        }
+                        //if (VecinoInferior(tab.rects[i], tab.rects[j]))
+                        //{
+                        //    Console.Write("(Rect " + j + "), ");
+                        //    Console.WriteLine();
+                        //}
+                        //if (VecinoIzquierda(tab.rects[i], tab.rects[j]))
+                        //{
+                        //    Console.Write("(Rect " + j + "), ");
+                        //    Console.WriteLine();
+                        //}
+                        //if (VecinoDerecha(tab.rects[i], tab.rects[j]))
+                        //{
+                        //    Console.Write("(Rect " + j + "), ");
+                        //    Console.WriteLine();
+                        //}
+                    }
+                }
+
             }
         }
         #endregion
@@ -510,52 +536,81 @@ namespace shikaku
             //Console.BackgroundColor = ConsoleColor.Green;
             //Console.WriteLine(" ");
 
-
             //Daremos por hecho que inicialmente no son vecinos
             bool vecino = false;
 
             //Recorremos 
             //Recorremos los bordes del rectángulo 1. Según el lado que sea, sumamos o restamos x o y. Usamos el método Dentro()
-            //Lado superior e inferior
-            for (int i = r1.lt.x; i < r1.rb.x; i++)
-            {
-                Coor c;
-                c.x = i; c.y = r1.lt.y - 1;
-                if (Dentro(c, r2))
-                { 
-                    vecino = true;
-                }
+            //Lado superior
+            int i = 0;
+            Coor c;
 
-                c.y = r1.rb.y + 1;
-                if (Dentro(c, r2))
-                {
-                    vecino = true;
-                }
-            }
-            //Lado izquierdo y derecho
-            for (int i = r1.lt.y; i < r1.rb.y; i++)
+            c.x = i; c.y = r1.lt.y - 2;
+            while (i < r1.rb.x && !Dentro(c, r2) && !vecino)
             {
-                Coor c;
-                c.x = r1.lt.x - 1;
-                c.y = i;
-                if (Dentro(c, r2))
-                {
-                    vecino = true;
-                }
-
-                c.x = r1.rb.x + 1;
-                if (Dentro(c, r2))
-                {
-                    vecino = true;
-                }
+                i++;
             }
+
+            if (Dentro(c, r2))
+            {
+                vecino = true;
+            }
+
+            ////Lado inferior
+            //i = 0;
+            //c.y = r1.rb.y + 2;
+            //while (i < r1.rb.x && !Dentro(c, r2) && !vecino)
+            //{
+            //    i++;
+            //}
+
+            //if (Dentro(c, r2))
+            //{
+            //    vecino = true;
+            //}
+
+            ////Lado izquierdo
+            //i = 0;
+            //c.x = r1.lt.x - 4;
+            //c.y = i;
+            //while (i < r1.lt.y && !Dentro(c, r2) && !vecino)
+            //{
+            //    i++;
+            //}
+
+            //if (Dentro(c, r2))
+            //{
+            //    vecino = true;
+            //}
+
+            ////Lado derecho
+            //i = 0;
+            //c.x = r1.rb.x + 4;
+            //while (i < r1.lt.y && !Dentro(c, r2) && !vecino)
+            //{
+            //    i++;
+            //}
+
+            //if (Dentro(c, r2))
+            //{
+            //    vecino = true;
+            //}
 
             return vecino;
         }
 
-        static void BuscaVecinos(Tablero tab)
+        static bool VecinoSuperior(Rect r1, Rect r2)
         {
+            int i = 0;
+            Coor c;
 
+            c.x = i * 4; c.y = r1.lt.y - 2;
+            while (i < r1.rb.x/4 && !Dentro(c, r2))
+            {
+                i++;
+            }
+
+            return Dentro(c, r2);
         }
 
         static void Pinta(Rect r, Color color)
