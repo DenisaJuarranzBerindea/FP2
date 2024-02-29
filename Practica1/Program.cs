@@ -376,10 +376,10 @@ namespace shikaku
             int pilares = 0; int indice = 0;
             int i = 0;
 
-            r.lt.x = r.lt.x/4;
-            r.lt.y = r.lt.y/2;
-            r.rb.x = r.rb.x/4;
-            r.rb.y = r.rb.y/2;
+            r.lt.x /= 4;
+            r.lt.y /= 2;
+            r.rb.x /= 4;
+            r.rb.y /= 2;
 
             while (i < p.Length && pilares < 2)
             {
@@ -488,7 +488,7 @@ namespace shikaku
                     if (tab.rects[i].lt.x >= 0 && tab.rects[i].lt.y >= 0)
                     {
                         Console.Write("(" + tab.rects[i].lt.x / 4 + ", " + tab.rects[i].lt.y / 2 + ") - (" + tab.rects[i].rb.x / 4 + ", " + tab.rects[i].rb.y / 2 +
-                            ")")/* "Correcto: " + CheckRect(tab.rects[i], tab.pils))*/;
+                            ")" + "Correcto: " + CheckRect(tab.rects[i], tab.pils)) ;
 
                     }
                 }
