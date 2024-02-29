@@ -262,7 +262,7 @@ namespace shikaku
             }
         }
 
-        #endregion
+        #endregion  //Solo cambiamos las coordenadas aquí. En el resto del programa no hay que tocas las coordenadas
 
         #region Lógica Rectángulos
         static bool Dentro(Coor c, Rect r)
@@ -400,7 +400,6 @@ namespace shikaku
                 if (p[indice].val == AreaRect(r))
                 {
                     coincide = true;
-
                 }
             }
 
