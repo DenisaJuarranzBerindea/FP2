@@ -1,4 +1,6 @@
-﻿namespace Coordinates
+﻿//Denisa Juarranz Berindea
+
+namespace Coordinates
 {
     class Coor
     {
@@ -48,8 +50,6 @@
         {
             return c1.x != c2.x || c1.y != c2.y;
         }
-
-
 
     }
 
