@@ -38,6 +38,7 @@ namespace Practica2
         static void Main()
         {
             Tablero nivel = new Tablero("levels/level00.dat");
+            nivel.Render();
         }
 
         //Constructora -
@@ -86,29 +87,29 @@ namespace Practica2
                     else if (fila[j] == "3") cas[j, i] = Casilla.Vitamina;
                     else if (fila[j] == "4") cas[j, i] = Casilla.MuroCelda;
 
-                    //Personajes
-                    else if (int.Parse(fila[j]) > 4)
-                    {
-                        pers[int.Parse(fila[j]) - pers.Length].ini = new Coor(0, 0);
-                        pers[int.Parse(fila[j]) - pers.Length].pos = new Coor(0, 0);
-                        pers[int.Parse(fila[j]) - pers.Length].dir = new Coor(0, 0);
-                        //Posición inicial
-                        pers[int.Parse(fila[j]) - pers.Length].ini.X = j;
-                        pers[int.Parse(fila[j]) - pers.Length].ini.Y = i;
-                        //La posición actual ahora mismo es ini
-                        pers[int.Parse(fila[j]) - pers.Length].pos = pers[pers.Length - int.Parse(fila[j])].ini;
-                        //La dirección depende del personaje
-                        if ((int.Parse(fila[j]) - pers.Length) < 9) //Enemigos
-                        {
-                            pers[int.Parse(fila[j]) - pers.Length].dir.X = 1;
-                            pers[int.Parse(fila[j]) - pers.Length].dir.Y = 0;
-                        }
-                        else //Pacman
-                        {
-                            pers[int.Parse(fila[j]) - pers.Length].dir.X = 0;
-                            pers[int.Parse(fila[j]) - pers.Length].dir.Y = 1;
-                        }
-                    }
+                    ////Personajes
+                    //else if (int.Parse(fila[j]) > 4)
+                    //{
+                    //    pers[int.Parse(fila[j]) - pers.Length].ini = new Coor(0, 0);
+                    //    pers[int.Parse(fila[j]) - pers.Length].pos = new Coor(0, 0);
+                    //    pers[int.Parse(fila[j]) - pers.Length].dir = new Coor(0, 0);
+                    //    //Posición inicial
+                    //    pers[int.Parse(fila[j]) - pers.Length].ini.X = j;
+                    //    pers[int.Parse(fila[j]) - pers.Length].ini.Y = i;
+                    //    //La posición actual ahora mismo es ini
+                    //    pers[int.Parse(fila[j]) - pers.Length].pos = pers[pers.Length - int.Parse(fila[j])].ini;
+                    //    //La dirección depende del personaje
+                    //    if ((int.Parse(fila[j]) - pers.Length) < 9) //Enemigos
+                    //    {
+                    //        pers[int.Parse(fila[j]) - pers.Length].dir.X = 1;
+                    //        pers[int.Parse(fila[j]) - pers.Length].dir.Y = 0;
+                    //    }
+                    //    else //Pacman
+                    //    {
+                    //        pers[int.Parse(fila[j]) - pers.Length].dir.X = 0;
+                    //        pers[int.Parse(fila[j]) - pers.Length].dir.Y = 1;
+                    //    }
+                    //}
                 }
             }
 
@@ -126,7 +127,38 @@ namespace Practica2
 
         public void Render()
         {
-            //
+            //Recorremos el tablero 
+            for (int i = 0; i < cas.GetLength(0) - 1; i++) 
+            {
+                for (int j = 0; j < cas.GetLength(1) - 1; j++)
+                {
+                    if (cas[j, i] == Casilla.Libre)
+                    {
+                        Console.Write("  ");
+                    }
+                    else if (cas[j, i] == Casilla.Muro) 
+                    {
+                        Console.BackgroundColor = ConsoleColor.Gray;
+                        Console.Write("  ");
+                    }
+                    else if (cas[j, i] == Casilla.Comida)
+                    {
+                        Console.Write("··");
+                    }
+                    else if (cas[j, i] == Casilla.Vitamina)
+                    {
+                        Console.Write("**");
+                    }
+                    else if (cas[j, i] == Casilla.MuroCelda)
+                    {
+                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                        Console.Write("  ");
+                    }
+
+
+                }
+                Console.WriteLine();
+            }
 
         }
 
