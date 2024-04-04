@@ -36,7 +36,7 @@ namespace Practica2
         private bool DEBUG = true; // flag para mensajes de depuracion en consola
 
         //Constructora - Excepción archivo nulo
-        //Excepción de diferente número de columnas
+        //Excepción de diferente número de columnas (Con un auxiliar?)
         public Tablero(string file)
         {
             StreamReader nivel = new StreamReader(file);
@@ -49,27 +49,41 @@ namespace Practica2
             //Leemos hasta el final del archivo
             while (!nivel.EndOfStream) 
             {
-                string fila = nivel.ReadLine().Split(' ', StringSplitOptions options = System.StringSplitOptions.None) ;
+                string[] fila = nivel.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 //Si hay texto, sumamos filas
-                if (fila != "")
+                if (fila != null)
                 {
                     nFils++;
                 }
-                //El numero de columnas es a longitud de cada fila
+                //El numero de columnas es la longitud de cada fila
                 nCols = fila.Length;
             }
 
             //Segunda lectura
-            //Seteamos el tamaño del tablero (a lo mejor hay que revertirlas)
+            //Seteamos el tamaño del tablero (a lo mejor hay que revertirlas) y el número de personajes
             cas = new Casilla[nCols, nFils];
+            pers = new Personaje[5];
             //Recorremos el tablero para rellenarlo
             for (int i = 0; i < nFils; i++)
             {
+                string[] fila = nivel.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 for (int j = 0; j < nCols; j++)
                 {
+                    //Tablero
+                    if (fila[j] == "0") cas[j, i] = Casilla.Libre;
+                    else if (fila[j] == "1") cas[j, i] = Casilla.Muro;
+                    else if (fila[j] == "2") cas[j, i] = Casilla.Comida;
+                    else if (fila[j] == "3") cas[j, i] = Casilla.Vitamina;
+                    else if (fila[j] == "4") cas[j, i] = Casilla.MuroCelda;
 
+                    //Personajes
+                    else if (int.Parse(fila[j]) >= 5 && int.Parse(fila[j]) <= 8)
+                    else if (fila[j] == "9") pers[0].ini.X = j;
                 }
             }
+
+            //Inicializamos la cuenta regresiva
+            lapFantasmas = lapCarcelFantasmas;
 
 
             nivel.Close();
