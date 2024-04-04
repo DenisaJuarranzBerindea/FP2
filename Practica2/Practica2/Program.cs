@@ -35,11 +35,17 @@ namespace Practica2
                     
         private bool DEBUG = true; // flag para mensajes de depuracion en consola
 
-        //Constructora - Excepción archivo nulo
+        static void Main()
+        {
+            Tablero nivel = new Tablero("levels/level00.dat");
+        }
+
+        //Constructora -
+        //Excepción archivo nulo
         //Excepción de diferente número de columnas (Con un auxiliar?)
         public Tablero(string file)
         {
-            StreamReader nivel = new StreamReader(file);
+            StreamReader lect1 = new StreamReader(file);
 
             //Dimensiones del tablero
             int nFils = 0;
@@ -47,9 +53,9 @@ namespace Practica2
 
             //Primera lectura
             //Leemos hasta el final del archivo
-            while (!nivel.EndOfStream) 
+            while (!lect1.EndOfStream) 
             {
-                string[] fila = nivel.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                string[] fila = lect1.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 //Si hay texto, sumamos filas
                 if (fila != null)
                 {
@@ -59,14 +65,18 @@ namespace Practica2
                 nCols = fila.Length;
             }
 
+            lect1.Close();
+
             //Segunda lectura
+            StreamReader lect2 = new StreamReader(file);
+
             //Seteamos el tamaño del tablero (a lo mejor hay que revertirlas) y el número de personajes
             cas = new Casilla[nCols, nFils];
             pers = new Personaje[5];
             //Recorremos el tablero para rellenarlo
             for (int i = 0; i < nFils; i++)
             {
-                string[] fila = nivel.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                string[] fila = lect2.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 for (int j = 0; j < nCols; j++)
                 {
                     //Tablero
@@ -77,24 +87,51 @@ namespace Practica2
                     else if (fila[j] == "4") cas[j, i] = Casilla.MuroCelda;
 
                     //Personajes
-                    else if (int.Parse(fila[j]) >= 5 && int.Parse(fila[j]) <= 8)
-                    else if (fila[j] == "9") pers[0].ini.X = j;
+                    else if (int.Parse(fila[j]) > 4)
+                    {
+                        pers[int.Parse(fila[j]) - pers.Length].ini = new Coor(0, 0);
+                        pers[int.Parse(fila[j]) - pers.Length].pos = new Coor(0, 0);
+                        pers[int.Parse(fila[j]) - pers.Length].dir = new Coor(0, 0);
+                        //Posición inicial
+                        pers[int.Parse(fila[j]) - pers.Length].ini.X = j;
+                        pers[int.Parse(fila[j]) - pers.Length].ini.Y = i;
+                        //La posición actual ahora mismo es ini
+                        pers[int.Parse(fila[j]) - pers.Length].pos = pers[pers.Length - int.Parse(fila[j])].ini;
+                        //La dirección depende del personaje
+                        if ((int.Parse(fila[j]) - pers.Length) < 9) //Enemigos
+                        {
+                            pers[int.Parse(fila[j]) - pers.Length].dir.X = 1;
+                            pers[int.Parse(fila[j]) - pers.Length].dir.Y = 0;
+                        }
+                        else //Pacman
+                        {
+                            pers[int.Parse(fila[j]) - pers.Length].dir.X = 0;
+                            pers[int.Parse(fila[j]) - pers.Length].dir.Y = 1;
+                        }
+                    }
                 }
             }
 
             //Inicializamos la cuenta regresiva
-            lapFantasmas = lapCarcelFantasmas;
+            lapFantasmas = lapCarcelFantasmas; 
+            //¿Hay que hacer la cuenta regresiva aquí? ¿No sería en el Main()?
 
+            //Inicializamos el random
+            if (DEBUG) rnd = new Random(100);
+            else rnd = new Random();
 
-            nivel.Close();
+            lect2.Close();
         }
 
 
-
-
-        static void Main()
+        public void Render()
         {
+            //
 
         }
+
+
+
+
     }
 }
