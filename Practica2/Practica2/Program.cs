@@ -1,5 +1,6 @@
 ﻿//Denisa Juarranz Berindea
 
+using System.Diagnostics;
 using System.Drawing;
 using Coordinates;
 
@@ -36,6 +37,11 @@ namespace Practica2
         {
             Tablero nivel = new Tablero("levels/level00.dat");
             nivel.Render();
+
+            //while (true)
+            //{
+            //    nivel.Render();
+            //}
         }
 
         //Constructora 
@@ -58,7 +64,7 @@ namespace Practica2
                 {
                     string[] fila = lect1.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
                     //Si hay texto, sumamos filas
-                    if (fila != null)
+                    if (fila[0] != "")
                     {
                         nFils++;
                         nCols = fila.Length;
@@ -101,28 +107,28 @@ namespace Practica2
                         //Personajes
                         else if (int.Parse(fila[j]) > 4)
                         {
-                            //int index = int.Parse(fila[j]) - pers.Length;
+                            int index = pers.Length - (int.Parse(fila[j]) - pers.Length) - 1;
                             cas[j, i] = Casilla.Libre;
-                            //pers[index].ini = new Coor(0, 0);
-                            //pers[index].pos = new Coor(0, 0);
-                            //pers[index].dir = new Coor(0, 0);
-                            ////Posición inicial
-                            //pers[index].ini.X = j;
-                            //pers[index].ini.Y = i;
-                            ////La posición actual ahora mismo es ini
-                            //pers[index].pos.X = j;
-                            //pers[index].pos.Y = i;
-                            ////La dirección depende del personaje
-                            //if ((int.Parse(fila[j]) - pers.Length) < 9) //Enemigos
-                            //{
-                            //    pers[index].dir.X = 1;
-                            //    pers[index].dir.Y = 0;
-                            //}
-                            //else //Pacman
-                            //{
-                            //    pers[index].dir.X = 0;
-                            //    pers[index].dir.Y = 1;
-                            //}
+                            pers[index].ini = new Coor(0, 0);
+                            pers[index].pos = new Coor(0, 0);
+                            pers[index].dir = new Coor(0, 0);
+                            //Posición inicial
+                            pers[index].ini.X = j*2;
+                            pers[index].ini.Y = i;
+                            //La posición actual ahora mismo es ini
+                            pers[index].pos.X = j*2;
+                            pers[index].pos.Y = i;
+                            //La dirección depende del personaje
+                            if ((int.Parse(fila[j]) - pers.Length) < 9) //Enemigos
+                            {
+                                pers[index].dir.X = 1;
+                                pers[index].dir.Y = 0;
+                            }
+                            else //Pacman
+                            {
+                                pers[0].dir.X = 0;
+                                pers[0].dir.Y = 1;
+                            }
                         }
                     }
                 }
@@ -142,20 +148,26 @@ namespace Practica2
 
         public void Render()
         {
+            Console.Clear();
+
             //Tablero
             RenderTablero();
 
-
             //Personajes
+            RenderPersonajes();
 
+            Console.SetCursorPosition(0, cas.GetLength(1));
+            Console.WriteLine();
+
+            if (DEBUG) Debug();
         }
 
         private void RenderTablero()
         {
             //Recorremos el tablero 
-            for (int i = 0; i < cas.GetLength(0) - 1; i++)
+            for (int i = 0; i < cas.GetLength(1); i++)
             {
-                for (int j = 0; j < cas.GetLength(1) - 1; j++)
+                for (int j = 0; j < cas.GetLength(0); j++)
                 {
                     if (cas[j, i] == Casilla.Libre)
                     {
@@ -172,21 +184,74 @@ namespace Practica2
                     }
                     else if (cas[j, i] == Casilla.Vitamina)
                     {
+                        Console.ForegroundColor = ConsoleColor.Green;
                         Console.Write("**");
+                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
                     else if (cas[j, i] == Casilla.MuroCelda)
                     {
-                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                        Console.BackgroundColor = ConsoleColor.Blue;
                         Console.Write("  ");
                     }
 
+                    Console.BackgroundColor = ConsoleColor.Black;
 
                 }
                 Console.WriteLine();
+                Console.BackgroundColor = ConsoleColor.Black;
+            }
+
+            Console.BackgroundColor = ConsoleColor.Black;
+        }
+
+        private void RenderPersonajes()
+        {
+            for (int i = 0; i < pers.Length; i++)
+            {
+                Console.SetCursorPosition(pers[i].pos.X, pers[i].pos.Y);
+                Console.BackgroundColor = colors[i];
+                if (i == 0) //PacMan
+                {
+                    if (pers[0].dir.X == 1 && pers[0].dir.Y == 0) //Derecha
+                    {
+                        Console.Write(">>");
+                    }
+                    else if (pers[0].dir.X == -1 && pers[0].dir.Y == 0) //Izquierda
+                    {
+                        Console.Write("<<");
+                    }
+                    else if (pers[0].dir.X == 0 && pers[0].dir.Y == 1) //Arriba
+                    {
+                        Console.Write("^^");
+                    }
+                    else if (pers[0].dir.X == -1 && pers[0].dir.Y == 0) //Abajo
+                    {
+                        Console.Write("vv");
+                    }
+                }
+                else //Fantasmas
+                {
+                    Console.Write("00");
+                }
+                Console.BackgroundColor = ConsoleColor.Black;
             }
         }
 
-
-
+        private void Debug()
+        {
+            for (int i = 0; i < pers.Length; i++)
+            {
+                Console.ForegroundColor = colors[i];
+                if (i == 0) //PacMan
+                {
+                    Console.WriteLine("PacMan: " + pers[0].dir.ToString());
+                }
+                else //Fantasmas
+                {
+                    Console.WriteLine("Fantasma: " + pers[i].dir.ToString());
+                }
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
+        }
     }
 }
