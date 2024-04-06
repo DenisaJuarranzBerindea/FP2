@@ -38,14 +38,32 @@ namespace Practica2
             Tablero nivel = new Tablero("levels/level00.dat");
             nivel.Render();
 
-            //while (true)
-            //{
-            //    nivel.Render();
-            //}
+            int lap = 200; //Retardo
+            char c = ' ';
+
+            while (true)
+            {
+                //Leemos el input del usuario
+                LeeInput(ref c);
+
+                //Procesamos el input
+                if (c != ' ' && nivel.CambiaDir(c)) c = ' ';
+
+                //Movemos en base al input
+                nivel.MuevePacman();
+
+                //IA Fantasmas
+
+                //Renderizamos 
+                nivel.Render();
+
+                // retardo
+                System.Threading.Thread.Sleep(lap);
+            }
         }
 
         //Constructora 
-        public Tablero(string file)
+        private Tablero(string file)
         {
             StreamReader lect1 = null;
 
@@ -101,8 +119,16 @@ namespace Practica2
                         //Tablero
                         if (fila[j] == "0") cas[j, i] = Casilla.Libre;
                         else if (fila[j] == "1") cas[j, i] = Casilla.Muro;
-                        else if (fila[j] == "2") cas[j, i] = Casilla.Comida;
-                        else if (fila[j] == "3") cas[j, i] = Casilla.Vitamina;
+                        else if (fila[j] == "2")
+                        {
+                            cas[j, i] = Casilla.Comida;
+                            numComida++;
+                        }
+                        else if (fila[j] == "3")
+                        {
+                            cas[j, i] = Casilla.Vitamina;
+                            numComida++;
+                        }
                         else if (fila[j] == "4") cas[j, i] = Casilla.MuroCelda;
                         //Personajes
                         else if (int.Parse(fila[j]) > 4)
@@ -113,13 +139,13 @@ namespace Practica2
                             pers[index].pos = new Coor(0, 0);
                             pers[index].dir = new Coor(0, 0);
                             //Posición inicial
-                            pers[index].ini.X = j*2;
+                            pers[index].ini.X = j * 2;
                             pers[index].ini.Y = i;
                             //La posición actual ahora mismo es ini
-                            pers[index].pos.X = j*2;
+                            pers[index].pos.X = j * 2;
                             pers[index].pos.Y = i;
                             //La dirección depende del personaje
-                            if ((int.Parse(fila[j]) - pers.Length) < 9) //Enemigos
+                            if (index > 0) //Enemigos
                             {
                                 pers[index].dir.X = 1;
                                 pers[index].dir.Y = 0;
@@ -146,7 +172,7 @@ namespace Practica2
 
         }
 
-        public void Render()
+        private void Render()
         {
             Console.Clear();
 
@@ -220,11 +246,11 @@ namespace Practica2
                     {
                         Console.Write("<<");
                     }
-                    else if (pers[0].dir.X == 0 && pers[0].dir.Y == 1) //Arriba
+                    else if (pers[0].dir.X == 0 && pers[0].dir.Y == -1) //Arriba
                     {
                         Console.Write("^^");
                     }
-                    else if (pers[0].dir.X == -1 && pers[0].dir.Y == 0) //Abajo
+                    else if (pers[0].dir.X == 0 && pers[0].dir.Y == 1) //Abajo
                     {
                         Console.Write("vv");
                     }
@@ -239,19 +265,128 @@ namespace Practica2
 
         private void Debug()
         {
+            Coor posUsuario = new Coor();
             for (int i = 0; i < pers.Length; i++)
             {
+                posUsuario.X = pers[i].pos.X / 2;
+                posUsuario.Y = pers[i].pos.Y;
+
                 Console.ForegroundColor = colors[i];
                 if (i == 0) //PacMan
                 {
-                    Console.WriteLine("PacMan: " + pers[0].dir.ToString());
+                    Console.WriteLine("PacMan: Dirección " + pers[0].dir.ToString() + " Posición " + posUsuario.ToString());
                 }
                 else //Fantasmas
-                {
-                    Console.WriteLine("Fantasma: " + pers[i].dir.ToString());
+                { 
+                    Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString());
                 }
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
+
+            Coor nextPos = new Coor();
+            Console.Write(Siguiente(pers[0].pos, pers[0].dir, out nextPos));
+            nextPos.X = nextPos.X / 2;
+            Console.Write(nextPos.ToString());
+
+            Console.WriteLine();
+
+            Console.WriteLine("Número de comida: " + numComida);
+            
+        }
+
+        private bool Siguiente(Coor pos, Coor dir, out Coor newPos)
+        {
+            newPos = new Coor();
+            //Calculamos la nueva posición, teniendo en mente los bordes de la pantalla
+            if (pos.X + dir.X >= 0) newPos.X = (pos.X + dir.X) % (cas.GetLength(0) * 2 - 1);
+            else newPos.X = cas.GetLength(0) * 2 - 1; //A VECES FUNCIONA, OTRAS NO
+
+            if (pos.Y + dir.Y >= 0) newPos.Y = (pos.Y + dir.Y) % cas.GetLength(1);
+            else newPos.Y = cas.GetLength(1) - 1; //A VECES FUNCIONA, OTRAS NO
+
+            //Si no hay muro, podrá seguir
+            if (cas[newPos.X / 2, newPos.Y] != Casilla.Muro)
+            { 
+                return true;
+            }
+            //Si hay muro, no seguirá
+            else return false;
+        }
+
+        private void MuevePacman()
+        {
+            Coor newPos = new Coor();
+            //Si se puede mover
+            if (Siguiente(pers[0].pos, pers[0].dir, out newPos))
+            {
+                //Se mueve a esa posición
+                pers[0].pos.X = newPos.X;
+                pers[0].pos.Y = newPos.Y;
+
+                //Si hay comida
+                if (cas[newPos.X / 2, newPos.Y] == Casilla.Comida ||
+                    cas[newPos.X / 2, newPos.Y] == Casilla.Vitamina)
+                {
+                    //Se la come
+                    numComida--;
+                    //Dejando la casilla libre
+                    cas[newPos.X / 2, newPos.Y] = Casilla.Libre;
+                }
+            }
+        }
+
+        private bool CambiaDir(char c)
+        {
+            Coor newPos = new Coor();
+            Coor newDir = new Coor();
+
+            if (c == 'l') //Izquierda
+            {
+                newDir.X = -1;
+                newDir.Y = 0;
+            }
+            else if (c == 'r') //Derecha
+            {
+                newDir.X = 1;
+                newDir.Y = 0;
+            }
+            else if (c == 'u') //Arriba
+            {
+                newDir.X = 0;
+                newDir.Y = -1;
+            }
+            else if (c == 'd') //Abajo
+            {
+                newDir.X = 0;
+                newDir.Y = 1;
+            }
+
+            //Si es posible el cambio
+            if (Siguiente(pers[0].pos, newDir, out newPos))
+            {
+                pers[0].dir = newDir;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private static void LeeInput(ref char dir)
+        {
+            if (Console.KeyAvailable)
+            {
+                string tecla = Console.ReadKey(true).Key.ToString();
+                switch (tecla)
+                {
+                    case "LeftArrow": dir = 'l'; break;
+                    case "UpArrow": dir = 'u'; break;
+                    case "RightArrow": dir = 'r'; break;
+                    case "DownArrow": dir = 'd'; break;
+                }
+            }
+            while (Console.KeyAvailable) Console.ReadKey().Key.ToString();
         }
     }
 }
