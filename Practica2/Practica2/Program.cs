@@ -3,6 +3,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using Coordinates;
+using SetArray;
 
 namespace Practica2
 {
@@ -23,8 +24,11 @@ namespace Practica2
         ConsoleColor[] colors = {ConsoleColor.DarkYellow, ConsoleColor.Red,
         ConsoleColor.Magenta, ConsoleColor.Cyan, ConsoleColor.DarkBlue };
 
+        public Coor[] cs; // Posibles nuevas posiciones de fantasmas
+
         const int lapCarcelFantasmas = 3000; // Retardo para quitar el muro a los fantasmas
         int lapFantasmas; // Tiempo restante para quitar el muro
+
         int numComida; // Numero de casillas restantes con comida o vitamina
 
         Random rnd; // Generador de aleatorios
@@ -294,18 +298,20 @@ namespace Practica2
             
         }
 
+        #region PacMan
+
         private bool Siguiente(Coor pos, Coor dir, out Coor newPos)
         {
             newPos = new Coor();
             //Calculamos la nueva posición, teniendo en mente los bordes de la pantalla
-            if (pos.X + dir.X >= 0) newPos.X = (pos.X + dir.X) % (cas.GetLength(0) * 2 - 1);
-            else newPos.X = cas.GetLength(0) * 2 - 1; //A VECES FUNCIONA, OTRAS NO
+            if (pos.X + dir.X >= 0) newPos.X = (pos.X + 2 * dir.X) % (cas.GetLength(0) * 2);
+            else newPos.X = (cas.GetLength(0) * 2) - 1;
 
             if (pos.Y + dir.Y >= 0) newPos.Y = (pos.Y + dir.Y) % cas.GetLength(1);
-            else newPos.Y = cas.GetLength(1) - 1; //A VECES FUNCIONA, OTRAS NO
+            else newPos.Y = cas.GetLength(1) - 1;
 
             //Si no hay muro, podrá seguir
-            if (cas[newPos.X / 2, newPos.Y] != Casilla.Muro)
+            if (cas[(newPos.X + 1) / 2, newPos.Y] != Casilla.Muro)
             { 
                 return true;
             }
@@ -388,5 +394,14 @@ namespace Practica2
             }
             while (Console.KeyAvailable) Console.ReadKey().Key.ToString();
         }
+
+        #endregion
+
+        #region Fantasmas
+
+
+
+        #endregion
+
     }
 }
