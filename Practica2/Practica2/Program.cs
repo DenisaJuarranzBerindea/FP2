@@ -26,6 +26,8 @@ namespace Practica2
 
         public Coor[] cs; // Posibles nuevas posiciones de fantasmas
 
+        public Coor[] dirs = new Coor[4]; //Direcciones (1,0), (0,1), (-1, 0), (0, -1) 
+
         const int lapCarcelFantasmas = 3000; // Retardo para quitar el muro a los fantasmas
         int lapFantasmas; // Tiempo restante para quitar el muro
 
@@ -41,6 +43,8 @@ namespace Practica2
         {
             Tablero nivel = new Tablero("levels/level00.dat");
             nivel.Render();
+
+            nivel.InicializaDirecciones();
 
             int lap = 200; //Retardo
             char c = ' ';
@@ -399,9 +403,48 @@ namespace Practica2
 
         #region Fantasmas
 
+        private bool HayFantasma(Coor c)
+        {
+            bool boo = false;
 
+            //Buscamos algún fantasma en esa posición
+            int i = 1;
+            while (i < pers.Length && !boo)
+            {
+                if (pers[i].pos == c)
+                {
+                    boo = true;
+                }
+                i++;
+            }
+
+            return boo;
+        }
+
+        //private int PosiblesDirs(int fant, out SetCoor cs)
+        //{
+        //    int posibles;
+
+            
+        //}
 
         #endregion
 
+
+        private void InicializaDirecciones()
+        {
+            //Derecha
+            dirs[0].X = 1;
+            dirs[0].Y = 0;
+            //Abajo
+            dirs[0].X = 0;
+            dirs[0].Y = 1;
+            //Izquierda
+            dirs[0].X = -1;
+            dirs[0].Y = 0;
+            //Arriba
+            dirs[0].X = 0;
+            dirs[0].Y = -1;
+        }
     }
 }
