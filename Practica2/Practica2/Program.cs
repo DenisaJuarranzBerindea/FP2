@@ -48,8 +48,10 @@ namespace Practica2
 
             int lap = 200; //Retardo
             char c = ' ';
+            bool pillado;
 
-            while (true)
+            //Siempre y cuando no haya sido pillado y no se haya comido toda la comida, seguirá el juego
+            while (!pillado && !FinJuego())
             {
                 //Leemos el input del usuario
                 LeeInput(ref c);
@@ -60,7 +62,14 @@ namespace Practica2
                 //Movemos en base al input
                 nivel.MuevePacman();
 
+                //Comprobamos colisiones
+                pillado = Captura();
+
                 //IA Fantasmas
+                nivel.MueveFantasmas(lapCarcelFantasmas);
+
+                //Comprobamos colisiones
+                pillado = Captura();
 
                 //Renderizamos 
                 nivel.Render();
@@ -346,6 +355,16 @@ namespace Practica2
                     //Dejando la casilla libre
                     cas[newPos.X / 2, newPos.Y] = Casilla.Libre;
                 }
+                
+                //Ademas, si es vitamina
+                if (cas[newPos.X / 2, newPos.Y] == Casilla.Vitamina)
+                {
+                    //Devuelve a los fantasmas a su posicion inicial
+                    for (int i = i; i < pers.Length; i++)
+                    {
+                        pers[i].pos = pers[i].ini;
+                    }
+                }
             }
         }
 
@@ -454,15 +473,73 @@ namespace Practica2
         private void SeleccionaDir (int fant)
         {
             Coor newDir = new Coor();
-            //Si solo tiene una dirección posible, que es la contraria de la actual
-            if (PosiblesDirs(fant, out SetCoor cs) == 1 && cs[0] == -1 * pers[fant].dir)
+            //Si solo tiene una dirección posible seguirá por esa
+            if (PosiblesDirs(fant, out SetCoor cs) == 1)
             {
                 newDir = cs[0];
             }
+            //Si tiene más de una dirección posible, eliminará la dirección contraria a la actual de la lista
             else
             {
 
             }
+        }
+
+        private void EliminaMuroFantasmas() //Por qué no se hace aquí el tema de quitar el muro después de x tiempo???
+        {
+            //Recorremos el tablero para encontrar todos los Casilla.MuroCelda
+            for (int i = 0; i < cas.GetLength(1); i++)
+            {
+                for (int j = 0; j < cas.GetLength(0); j++)
+                {
+                    //Si son muros de celda, los deja libres
+                    if (cas[j, i] == Casilla.MuroCelda)
+                    {
+                        cas[j, i] = Casilla.Libre;
+                    }
+                }
+            }
+        }
+
+        private void MueveFantasmas(int lap) //No tengo claro cómo hacer lo del temporizador aquí
+        {
+            Coor newPos = new Coor();
+            for (int i = i; i < pers.Length; i++)
+            {
+                //Si la dirección seleccionada es válida
+                if (Siguiente(pers[i].pos, SeleccionaDir(i), newPos))
+                {
+                    pers[i].dir = SeleccionaDir(i);
+                }
+
+            }
+        }
+
+
+        #endregion
+
+        #region Logica fin juego
+
+        private bool Captura()
+        {
+            bool pillado = false;
+            int i = i;
+            while (pers[i].pos != pers[0].pos)
+            {
+                i++;
+            }
+
+            if (pers[i].pos == pers[0].pos)
+            {
+                pillado = true;
+            }
+
+            return pillado;
+        }
+
+        private bool FinJuego()
+        {
+            return numComida > 0;
         }
 
         #endregion
