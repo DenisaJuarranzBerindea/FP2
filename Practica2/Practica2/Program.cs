@@ -286,7 +286,11 @@ namespace Practica2
                 }
                 else //Fantasmas
                 { 
-                    Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString());
+                    Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString() + "Posibles direcciones: ");
+                    for (int j = 0; j < cs.Length; j++)
+                    {
+                        Console.Write(cs[j].ToString());
+                    }
                 }
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
@@ -421,12 +425,45 @@ namespace Practica2
             return boo;
         }
 
-        //private int PosiblesDirs(int fant, out SetCoor cs)
-        //{
-        //    int posibles;
+        private int PosiblesDirs(int fant, out SetCoor cs)
+        {
+            int posibles;
+ 
+            //Recorremos las posibles direcciones
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                //Calculamos la coordenada siguiente
+                Coor nextCoor = pers[fant].pos + dirs[i];
 
-            
-        //}
+                //Si no hay fantasma, ni muro en esa posición
+                if (!HayFantasma(nextCoor) && cas[nextCoor.X, nextCoor.Y] != Casilla.Muro)
+                {
+                    //Añadimos esa dirección en el array de caminos posibles
+                    cs[posibles] = dirs[i];
+                    //Y aumentamos el índice
+                    posibles++;
+                }
+            }
+
+            return posibles;
+
+        }
+
+        /*utiliza el método anterior para obtener el conjunto de posibles direcciones para el fantasma fant y después elige una aleatoria según lo explicado.
+         */
+        private void SeleccionaDir (int fant)
+        {
+            Coor newDir = new Coor();
+            //Si solo tiene una dirección posible, que es la contraria de la actual
+            if (PosiblesDirs(fant, out SetCoor cs) == 1 && cs[0] == -1 * pers[fant].dir)
+            {
+                newDir = cs[0];
+            }
+            else
+            {
+
+            }
+        }
 
         #endregion
 
@@ -437,14 +474,14 @@ namespace Practica2
             dirs[0].X = 1;
             dirs[0].Y = 0;
             //Abajo
-            dirs[0].X = 0;
-            dirs[0].Y = 1;
+            dirs[1].X = 0;
+            dirs[1].Y = 1;
             //Izquierda
-            dirs[0].X = -1;
-            dirs[0].Y = 0;
+            dirs[2].X = -1;
+            dirs[2].Y = 0;
             //Arriba
-            dirs[0].X = 0;
-            dirs[0].Y = -1;
+            dirs[3].X = 0;
+            dirs[3].Y = -1;
         }
     }
 }
