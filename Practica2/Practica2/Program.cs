@@ -26,7 +26,7 @@ namespace Practica2
 
         public Coor[] cs; // Posibles nuevas posiciones de fantasmas
 
-        public Coor[] dirs = new Coor[4]; //Direcciones (1,0), (0,1), (-1, 0), (0, -1) 
+        //public Coor[] dirs = new Coor[4]; //Direcciones (1,0), (0,1), (-1, 0), (0, -1) 
 
         const int lapCarcelFantasmas = 3000; // Retardo para quitar el muro a los fantasmas
         int lapFantasmas; // Tiempo restante para quitar el muro
@@ -44,14 +44,14 @@ namespace Practica2
             Tablero nivel = new Tablero("levels/level00.dat");
             nivel.Render();
 
-            nivel.InicializaDirecciones();
+            //nivel.InicializaDirecciones();
 
             int lap = 200; //Retardo
             char c = ' ';
-            bool pillado;
+            bool pillado = false;
 
             //Siempre y cuando no haya sido pillado y no se haya comido toda la comida, seguirá el juego
-            while (!pillado && !FinJuego())
+            while (!pillado && nivel.FinJuego())
             {
                 //Leemos el input del usuario
                 LeeInput(ref c);
@@ -62,14 +62,14 @@ namespace Practica2
                 //Movemos en base al input
                 nivel.MuevePacman();
 
-                //Comprobamos colisiones
-                pillado = Captura();
+                ////Comprobamos colisiones
+                //pillado = nivel.Captura();
 
-                //IA Fantasmas
-                nivel.MueveFantasmas(lapCarcelFantasmas);
+                ////IA Fantasmas
+                //nivel.MueveFantasmas(lapCarcelFantasmas);
 
-                //Comprobamos colisiones
-                pillado = Captura();
+                ////Comprobamos colisiones
+                //pillado = nivel.Captura();
 
                 //Renderizamos 
                 nivel.Render();
@@ -296,10 +296,10 @@ namespace Practica2
                 else //Fantasmas
                 { 
                     Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString() + "Posibles direcciones: ");
-                    for (int j = 0; j < cs.Length; j++)
-                    {
-                        Console.Write(cs[j].ToString());
-                    }
+                    //for (int j = 0; j < cs.Length; j++)
+                    //{
+                    //    Console.Write(cs[j].ToString());
+                    //}
                 }
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
@@ -328,7 +328,7 @@ namespace Practica2
             else newPos.Y = cas.GetLength(1) - 1;
 
             //Si no hay muro, podrá seguir
-            if (cas[(newPos.X + 1) / 2, newPos.Y] != Casilla.Muro)
+            if (cas[newPos.X / 2, newPos.Y] != Casilla.Muro)
             { 
                 return true;
             }
@@ -360,7 +360,7 @@ namespace Practica2
                 if (cas[newPos.X / 2, newPos.Y] == Casilla.Vitamina)
                 {
                     //Devuelve a los fantasmas a su posicion inicial
-                    for (int i = i; i < pers.Length; i++)
+                    for (int i = 1; i < pers.Length; i++)
                     {
                         pers[i].pos = pers[i].ini;
                     }
@@ -426,94 +426,94 @@ namespace Practica2
 
         #region Fantasmas
 
-        private bool HayFantasma(Coor c)
-        {
-            bool boo = false;
+        //private bool HayFantasma(Coor c)
+        //{
+        //    bool boo = false;
 
-            //Buscamos algún fantasma en esa posición
-            int i = 1;
-            while (i < pers.Length && !boo)
-            {
-                if (pers[i].pos == c)
-                {
-                    boo = true;
-                }
-                i++;
-            }
+        //    //Buscamos algún fantasma en esa posición
+        //    int i = 1;
+        //    while (i < pers.Length && !boo)
+        //    {
+        //        if (pers[i].pos == c)
+        //        {
+        //            boo = true;
+        //        }
+        //        i++;
+        //    }
 
-            return boo;
-        }
+        //    return boo;
+        //}
 
-        private int PosiblesDirs(int fant, out SetCoor cs)
-        {
-            int posibles;
- 
-            //Recorremos las posibles direcciones
-            for (int i = 0; i < dirs.Length; i++)
-            {
-                //Calculamos la coordenada siguiente
-                Coor nextCoor = pers[fant].pos + dirs[i];
+        //private int PosiblesDirs(int fant, out SetCoor cs)
+        //{
+        //    int posibles;
 
-                //Si no hay fantasma, ni muro en esa posición
-                if (!HayFantasma(nextCoor) && cas[nextCoor.X, nextCoor.Y] != Casilla.Muro)
-                {
-                    //Añadimos esa dirección en el array de caminos posibles
-                    cs[posibles] = dirs[i];
-                    //Y aumentamos el índice
-                    posibles++;
-                }
-            }
+        //    //Recorremos las posibles direcciones
+        //    for (int i = 0; i < dirs.Length; i++)
+        //    {
+        //        //Calculamos la coordenada siguiente
+        //        Coor nextCoor = pers[fant].pos + dirs[i];
 
-            return posibles;
+        //        //Si no hay fantasma, ni muro en esa posición
+        //        if (!HayFantasma(nextCoor) && cas[nextCoor.X, nextCoor.Y] != Casilla.Muro)
+        //        {
+        //            //Añadimos esa dirección en el array de caminos posibles
+        //            cs[posibles] = dirs[i];
+        //            //Y aumentamos el índice
+        //            posibles++;
+        //        }
+        //    }
 
-        }
+        //    return posibles;
 
-        /*utiliza el método anterior para obtener el conjunto de posibles direcciones para el fantasma fant y después elige una aleatoria según lo explicado.
-         */
-        private void SeleccionaDir (int fant)
-        {
-            Coor newDir = new Coor();
-            //Si solo tiene una dirección posible seguirá por esa
-            if (PosiblesDirs(fant, out SetCoor cs) == 1)
-            {
-                newDir = cs[0];
-            }
-            //Si tiene más de una dirección posible, eliminará la dirección contraria a la actual de la lista
-            else
-            {
+        //}
 
-            }
-        }
+        ///*utiliza el método anterior para obtener el conjunto de posibles direcciones para el fantasma fant y después elige una aleatoria según lo explicado.
+        // */
+        //private void SeleccionaDir (int fant)
+        //{
+        //    Coor newDir = new Coor();
+        //    //Si solo tiene una dirección posible seguirá por esa
+        //    if (PosiblesDirs(fant, out SetCoor cs) == 1)
+        //    {
+        //        newDir = cs[0];
+        //    }
+        //    //Si tiene más de una dirección posible, eliminará la dirección contraria a la actual de la lista
+        //    else
+        //    {
 
-        private void EliminaMuroFantasmas() //Por qué no se hace aquí el tema de quitar el muro después de x tiempo???
-        {
-            //Recorremos el tablero para encontrar todos los Casilla.MuroCelda
-            for (int i = 0; i < cas.GetLength(1); i++)
-            {
-                for (int j = 0; j < cas.GetLength(0); j++)
-                {
-                    //Si son muros de celda, los deja libres
-                    if (cas[j, i] == Casilla.MuroCelda)
-                    {
-                        cas[j, i] = Casilla.Libre;
-                    }
-                }
-            }
-        }
+        //    }
+        //}
 
-        private void MueveFantasmas(int lap) //No tengo claro cómo hacer lo del temporizador aquí
-        {
-            Coor newPos = new Coor();
-            for (int i = i; i < pers.Length; i++)
-            {
-                //Si la dirección seleccionada es válida
-                if (Siguiente(pers[i].pos, SeleccionaDir(i), newPos))
-                {
-                    pers[i].dir = SeleccionaDir(i);
-                }
+        //private void EliminaMuroFantasmas() //Por qué no se hace aquí el tema de quitar el muro después de x tiempo???
+        //{
+        //    //Recorremos el tablero para encontrar todos los Casilla.MuroCelda
+        //    for (int i = 0; i < cas.GetLength(1); i++)
+        //    {
+        //        for (int j = 0; j < cas.GetLength(0); j++)
+        //        {
+        //            //Si son muros de celda, los deja libres
+        //            if (cas[j, i] == Casilla.MuroCelda)
+        //            {
+        //                cas[j, i] = Casilla.Libre;
+        //            }
+        //        }
+        //    }
+        //}
 
-            }
-        }
+        //private void MueveFantasmas(int lap) //No tengo claro cómo hacer lo del temporizador aquí
+        //{
+        //    Coor newPos = new Coor();
+        //    for (int i = i; i < pers.Length; i++)
+        //    {
+        //        //Si la dirección seleccionada es válida
+        //        if (Siguiente(pers[i].pos, SeleccionaDir(i), newPos))
+        //        {
+        //            pers[i].dir = SeleccionaDir(i);
+        //        }
+
+        //    }
+        //}
 
 
         #endregion
@@ -523,7 +523,7 @@ namespace Practica2
         private bool Captura()
         {
             bool pillado = false;
-            int i = i;
+            int i = 1;
             while (pers[i].pos != pers[0].pos)
             {
                 i++;
@@ -545,20 +545,20 @@ namespace Practica2
         #endregion
 
 
-        private void InicializaDirecciones()
-        {
-            //Derecha
-            dirs[0].X = 1;
-            dirs[0].Y = 0;
-            //Abajo
-            dirs[1].X = 0;
-            dirs[1].Y = 1;
-            //Izquierda
-            dirs[2].X = -1;
-            dirs[2].Y = 0;
-            //Arriba
-            dirs[3].X = 0;
-            dirs[3].Y = -1;
-        }
+        //private void InicializaDirecciones()
+        //{
+        //    //Derecha
+        //    dirs[0].X = 1;
+        //    dirs[0].Y = 0;
+        //    //Abajo
+        //    dirs[1].X = 0;
+        //    dirs[1].Y = 1;
+        //    //Izquierda
+        //    dirs[2].X = -1;
+        //    dirs[2].Y = 0;
+        //    //Arriba
+        //    dirs[3].X = 0;
+        //    dirs[3].Y = -1;
+        //}
     }
 }
