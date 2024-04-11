@@ -24,9 +24,9 @@ namespace Practica2
         ConsoleColor[] colors = {ConsoleColor.DarkYellow, ConsoleColor.Red,
         ConsoleColor.Magenta, ConsoleColor.Cyan, ConsoleColor.DarkBlue };
 
-        public Coor[] cs; // Posibles nuevas posiciones de fantasmas
+        public SetCoor cs; // Posibles nuevas posiciones de fantasmas
 
-        //public Coor[] dirs = new Coor[4]; //Direcciones (1,0), (0,1), (-1, 0), (0, -1) 
+        public Coor[] dirs = new Coor[4]; //Direcciones (1,0), (0,1), (-1, 0), (0, -1) 
 
         const int lapCarcelFantasmas = 3000; // Retardo para quitar el muro a los fantasmas
         int lapFantasmas; // Tiempo restante para quitar el muro
@@ -44,7 +44,7 @@ namespace Practica2
             Tablero nivel = new Tablero("levels/level00.dat");
             nivel.Render();
 
-            //nivel.InicializaDirecciones();
+            nivel.InicializaDirecciones();
 
             int lap = 200; //Retardo
             char c = ' ';
@@ -295,23 +295,19 @@ namespace Practica2
                 }
                 else //Fantasmas
                 { 
-                    Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString() + "Posibles direcciones: ");
-                    //for (int j = 0; j < cs.Length; j++)
-                    //{
-                    //    Console.Write(cs[j].ToString());
-                    //}
+                    Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString() +  " Posibles direcciones: " + PosiblesDirs(i, out cs));                   
                 }
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
 
-            Coor nextPos = new Coor();
-            Console.Write(Siguiente(pers[0].pos, pers[0].dir, out nextPos));
-            nextPos.X = nextPos.X / 2;
-            Console.Write(nextPos.ToString());
+            //Coor nextPos = new Coor();
+            //Console.Write(Siguiente(pers[0].pos, pers[0].dir, out nextPos));
+            //nextPos.X = nextPos.X / 2;
+            //Console.Write(nextPos.ToString());
 
-            Console.WriteLine();
+            //Console.WriteLine();
 
-            Console.WriteLine("Número de comida: " + numComida);
+            //Console.WriteLine("Número de comida: " + numComida);
             
         }
 
@@ -426,47 +422,48 @@ namespace Practica2
 
         #region Fantasmas
 
-        //private bool HayFantasma(Coor c)
-        //{
-        //    bool boo = false;
+        private bool HayFantasma(Coor c)
+        {
+            bool boo = false;
 
-        //    //Buscamos algún fantasma en esa posición
-        //    int i = 1;
-        //    while (i < pers.Length && !boo)
-        //    {
-        //        if (pers[i].pos == c)
-        //        {
-        //            boo = true;
-        //        }
-        //        i++;
-        //    }
+            //Buscamos algún fantasma en esa posición
+            int i = 1;
+            while (i < pers.Length && !boo)
+            {
+                if (pers[i].pos == c)
+                {
+                    boo = true;
+                }
+                i++;
+            }
 
-        //    return boo;
-        //}
+            return boo;
+        }
 
-        //private int PosiblesDirs(int fant, out SetCoor cs)
-        //{
-        //    int posibles;
+        private int PosiblesDirs(int fant, out SetCoor cs)
+        {
+            InicializaDirecciones();
+            cs = new SetCoor();
 
-        //    //Recorremos las posibles direcciones
-        //    for (int i = 0; i < dirs.Length; i++)
-        //    {
-        //        //Calculamos la coordenada siguiente
-        //        Coor nextCoor = pers[fant].pos + dirs[i];
+            //Recorremos las posibles direcciones
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                //Calculamos la coordenada siguiente
+                Coor nextCoor = new Coor();
+                nextCoor.X = (pers[fant].pos.X + dirs[i].X) / 2;
+                nextCoor.Y = pers[fant].pos.Y + dirs[i].Y;
 
-        //        //Si no hay fantasma, ni muro en esa posición
-        //        if (!HayFantasma(nextCoor) && cas[nextCoor.X, nextCoor.Y] != Casilla.Muro)
-        //        {
-        //            //Añadimos esa dirección en el array de caminos posibles
-        //            cs[posibles] = dirs[i];
-        //            //Y aumentamos el índice
-        //            posibles++;
-        //        }
-        //    }
+                //Si no hay fantasma, ni muro en esa posición
+                if (!HayFantasma(nextCoor) && cas[nextCoor.X / 2, nextCoor.Y] != Casilla.Muro)
+                {
+                    //Añadimos esa dirección en los caminos posibles
+                    cs.Add(dirs[i]);
+                }
+            }
 
-        //    return posibles;
+            return cs.Size();
 
-        //}
+        }
 
         ///*utiliza el método anterior para obtener el conjunto de posibles direcciones para el fantasma fant y después elige una aleatoria según lo explicado.
         // */
@@ -545,20 +542,24 @@ namespace Practica2
         #endregion
 
 
-        //private void InicializaDirecciones()
-        //{
-        //    //Derecha
-        //    dirs[0].X = 1;
-        //    dirs[0].Y = 0;
-        //    //Abajo
-        //    dirs[1].X = 0;
-        //    dirs[1].Y = 1;
-        //    //Izquierda
-        //    dirs[2].X = -1;
-        //    dirs[2].Y = 0;
-        //    //Arriba
-        //    dirs[3].X = 0;
-        //    dirs[3].Y = -1;
-        //}
+        private void InicializaDirecciones()
+        {
+            for (int i = 0; i < dirs.Length; i++) 
+            {
+                dirs[i] = new Coor();
+            }
+            //Derecha
+            dirs[0].X = 1;
+            dirs[0].Y = 0;
+            //Abajo
+            dirs[1].X = 0;
+            dirs[1].Y = 1;
+            //Izquierda
+            dirs[2].X = -1;
+            dirs[2].Y = 0;
+            //Arriba
+            dirs[3].X = 0;
+            dirs[3].Y = -1;
+        }
     }
 }
