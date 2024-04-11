@@ -322,7 +322,7 @@ namespace Practica2
             newPos = new Coor();
             //Calculamos la nueva posición, teniendo en mente los bordes de la pantalla
             if (pos.X + dir.X >= 0) newPos.X = (pos.X + 2 * dir.X) % (cas.GetLength(0) * 2);
-            else newPos.X = (cas.GetLength(0) * 2) - 1;
+            else newPos.X = (cas.GetLength(0) * 2) - 2;
 
             if (pos.Y + dir.Y >= 0) newPos.Y = (pos.Y + dir.Y) % cas.GetLength(1);
             else newPos.Y = cas.GetLength(1) - 1;
