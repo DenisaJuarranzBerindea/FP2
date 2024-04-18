@@ -66,7 +66,7 @@ namespace Practica2
                 ////Comprobamos colisiones
                 //pillado = nivel.Captura();
 
-                //IA Fantasmas
+                ////IA Fantasmas
                 nivel.MueveFantasmas(lapCarcelFantasmas);
 
                 ////Comprobamos colisiones
@@ -486,7 +486,9 @@ namespace Practica2
                 nextCoor.Y = pers[fant].pos.Y + dirs[i].Y;
 
                 //Si no hay fantasma, ni muro en esa posición
-                if (!HayFantasma(nextCoor) && cas[nextCoor.X / 2, nextCoor.Y] == Casilla.Libre)
+                if (!HayFantasma(nextCoor) && cas[nextCoor.X / 2, nextCoor.Y] == Casilla.Libre &&
+                    cas[nextCoor.X / 2, nextCoor.Y] != Casilla.Muro && 
+                    cas[nextCoor.X / 2, nextCoor.Y] != Casilla.MuroCelda)
                 {
                     //Añadimos esa dirección en los caminos posibles
                     cs.Add(dirs[i]);
@@ -516,26 +518,36 @@ namespace Practica2
                 contraria.Y = pers[fant].dir.Y * -1;
                 cs.Remove(contraria);
 
-                //Seleccionamos una aleatoria
+                //Random
+                Random rnd = new Random();
+                int k = rnd.Next(0, cs.Size());
+
+                int i = 0;
+                while (i < k - 1)
+                {
+                    cs.Remove(cs.PopElem());
+                }
+
+                //Seleccionamos la que queda
                 pers[fant].dir = cs.PopElem();
             }
         }
 
-        //private void EliminaMuroFantasmas() //Por qué no se hace aquí el tema de quitar el muro después de x tiempo???
-        //{
-        //    //Recorremos el tablero para encontrar todos los Casilla.MuroCelda
-        //    for (int i = 0; i < cas.GetLength(1); i++)
-        //    {
-        //        for (int j = 0; j < cas.GetLength(0); j++)
-        //        {
-        //            //Si son muros de celda, los deja libres
-        //            if (cas[j, i] == Casilla.MuroCelda)
-        //            {
-        //                cas[j, i] = Casilla.Libre;
-        //            }
-        //        }
-        //    }
-        //}
+        private void EliminaMuroFantasmas() //Por qué no se hace aquí el tema de quitar el muro después de x tiempo???
+        {
+            //Recorremos el tablero para encontrar todos los Casilla.MuroCelda
+            for (int i = 0; i < cas.GetLength(1); i++)
+            {
+                for (int j = 0; j < cas.GetLength(0); j++)
+                {
+                    //Si son muros de celda, los deja libres
+                    if (cas[j, i] == Casilla.MuroCelda)
+                    {
+                        cas[j, i] = Casilla.Libre;
+                    }
+                }
+            }
+        }
 
         private void MueveFantasmas(int lap) //No tengo claro cómo hacer lo del temporizador aquí
         {
@@ -545,6 +557,7 @@ namespace Practica2
                 //Si la dirección seleccionada es válida
                 if (Siguiente(pers[i].pos, pers[i].dir, out newPos))
                 {
+                    SeleccionaDir(i);
                     //Se mueve a esa posición
                     pers[i].pos.X = newPos.X;
                     pers[i].pos.Y = newPos.Y;
