@@ -1,5 +1,6 @@
 ﻿//Denisa Juarranz Berindea
 
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Drawing;
 using Coordinates;
@@ -504,8 +505,14 @@ namespace Practica2
          //A ver, técnicamente para elegir la dirección nueva, hay que quitar k-1 elementos y luego coger el que quede(?
         private void SeleccionaDir(int fant)
         {
+            SetCoor cs = new SetCoor();
+            if (cs.Empty())
+            {
+                pers[fant].dir = new Coor();
+            }
             //Si solo tiene una dirección posible seguirá por esa
-            if (PosiblesDirs(fant, out SetCoor cs) == 1)
+            
+            if (PosiblesDirs(fant, out cs) == 1)
             {
                 pers[fant].dir = cs.PopElem();
             }
@@ -531,6 +538,7 @@ namespace Practica2
                 //Seleccionamos la que queda
                 pers[fant].dir = cs.PopElem();
             }
+            
         }
 
         private void EliminaMuroFantasmas() //Por qué no se hace aquí el tema de quitar el muro después de x tiempo???
