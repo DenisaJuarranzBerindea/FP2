@@ -27,6 +27,7 @@ namespace Practica2
         public SetCoor cs; // Posibles nuevas posiciones de fantasmas
 
         public Coor[] dirs = new Coor[4]; //Direcciones (1,0), (0,1), (-1, 0), (0, -1) 
+        public Coor[] muroFants = new Coor[4];
 
         const int lapCarcelFantasmas = 3000; // Retardo para quitar el muro a los fantasmas
         int lapFantasmas; // Tiempo restante para quitar el muro
@@ -65,8 +66,8 @@ namespace Practica2
                 ////Comprobamos colisiones
                 //pillado = nivel.Captura();
 
-                ////IA Fantasmas
-                //nivel.MueveFantasmas(lapCarcelFantasmas);
+                //IA Fantasmas
+                nivel.MueveFantasmas(lapCarcelFantasmas);
 
                 ////Comprobamos colisiones
                 //pillado = nivel.Captura();
@@ -76,6 +77,15 @@ namespace Practica2
 
                 // retardo
                 System.Threading.Thread.Sleep(lap);
+            }
+
+            if (nivel.FinJuego())
+            {
+                Console.WriteLine("Enhorabuena, has ganado");
+            }
+            else if (pillado)
+            {
+                Console.WriteLine("Oh, vaya... se te ha comido el coco");
             }
         }
 
@@ -488,21 +498,28 @@ namespace Practica2
         }
 
         ///*utiliza el método anterior para obtener el conjunto de posibles direcciones para el fantasma fant y después elige una aleatoria según lo explicado.
-        // */
-        //private void SeleccionaDir (int fant)
-        //{
-        //    Coor newDir = new Coor();
-        //    //Si solo tiene una dirección posible seguirá por esa
-        //    if (PosiblesDirs(fant, out SetCoor cs) == 1)
-        //    {
-        //        newDir = cs[0];
-        //    }
-        //    //Si tiene más de una dirección posible, eliminará la dirección contraria a la actual de la lista
-        //    else
-        //    {
+         //*/
+         //A ver, técnicamente para elegir la dirección nueva, hay que quitar k-1 elementos y luego coger el que quede(?
+        private void SeleccionaDir(int fant)
+        {
+            //Si solo tiene una dirección posible seguirá por esa
+            if (PosiblesDirs(fant, out SetCoor cs) == 1)
+            {
+                pers[fant].dir = cs.PopElem();
+            }
+            //Si tiene más de una dirección posible, eliminará la dirección contraria a la actual de la lista
+            else
+            {
+                //Eliminamos la contraria
+                Coor contraria = new Coor();
+                contraria.X = pers[fant].dir.X * -1;
+                contraria.Y = pers[fant].dir.Y * -1;
+                cs.Remove(contraria);
 
-        //    }
-        //}
+                //Seleccionamos una aleatoria
+                pers[fant].dir = cs.PopElem();
+            }
+        }
 
         //private void EliminaMuroFantasmas() //Por qué no se hace aquí el tema de quitar el muro después de x tiempo???
         //{
@@ -520,19 +537,20 @@ namespace Practica2
         //    }
         //}
 
-        //private void MueveFantasmas(int lap) //No tengo claro cómo hacer lo del temporizador aquí
-        //{
-        //    Coor newPos = new Coor();
-        //    for (int i = i; i < pers.Length; i++)
-        //    {
-        //        //Si la dirección seleccionada es válida
-        //        if (Siguiente(pers[i].pos, SeleccionaDir(i), newPos))
-        //        {
-        //            pers[i].dir = SeleccionaDir(i);
-        //        }
-
-        //    }
-        //}
+        private void MueveFantasmas(int lap) //No tengo claro cómo hacer lo del temporizador aquí
+        {
+            Coor newPos = new Coor();
+            for (int i = 1; i < pers.Length; i++)
+            {
+                //Si la dirección seleccionada es válida
+                if (Siguiente(pers[i].pos, pers[i].dir, out newPos))
+                {
+                    //Se mueve a esa posición
+                    pers[i].pos.X = newPos.X;
+                    pers[i].pos.Y = newPos.Y;
+                }
+            }
+        }
 
 
         #endregion
