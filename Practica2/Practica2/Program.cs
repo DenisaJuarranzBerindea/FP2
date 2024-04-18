@@ -300,6 +300,23 @@ namespace Practica2
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
 
+            //Comprueba si cada fantasma tiene fantasmas a su alrededor
+            for (int i = 1;  i < pers.Length; i++) 
+            {
+                for (int j = 0; j < dirs.Length; j++) 
+                {
+                    Coor coor = new Coor();
+                    coor.X = pers[i].pos.X + dirs[j].X;
+                    coor.Y = pers[i].pos.Y + dirs[j].Y;
+
+                    Console.ForegroundColor = colors[i];
+                    Console.WriteLine("Hay fantasma en la dirección: " + dirs[j].ToString() + " para el fantasma" + i);
+                    Console.ForegroundColor = ConsoleColor.Gray;
+
+                }
+    
+            }
+
             //Coor nextPos = new Coor();
             //Console.Write(Siguiente(pers[0].pos, pers[0].dir, out nextPos));
             //nextPos.X = nextPos.X / 2;
