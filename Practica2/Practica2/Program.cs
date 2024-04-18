@@ -295,28 +295,32 @@ namespace Practica2
                 }
                 else //Fantasmas
                 { 
-                    Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString() +  " Posibles direcciones: " + PosiblesDirs(i, out cs));                   
+                    Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString() +  " Posibles direcciones: " + PosiblesDirs(i, out cs)); 
+                    Console.WriteLine(cs.ToString());
+                    
                 }
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
 
-            //Comprueba si cada fantasma tiene fantasmas a su alrededor
-            for (int i = 1;  i < pers.Length; i++) 
-            {
-                for (int j = 0; j < dirs.Length; j++) 
-                {
-                    Coor coor = new Coor();
-                    coor.X = pers[i].pos.X + dirs[j].X;
-                    coor.Y = pers[i].pos.Y + dirs[j].Y;
+            ////Fantasmas alrededor
+            //for (int i = 1; i < pers.Length; i++)
+            //{
+            //    for (int j = 0; j < dirs.Length; j++)
+            //    {
+            //        Coor coor = new Coor();
+            //        coor.X = pers[i].pos.X + dirs[j].X * 2;
+            //        coor.Y = pers[i].pos.Y + dirs[j].Y;
 
-                    Console.ForegroundColor = colors[i];
-                    Console.WriteLine("Hay fantasma en la dirección: " + dirs[j].ToString() + " para el fantasma" + i);
-                    Console.ForegroundColor = ConsoleColor.Gray;
+            //        if (HayFantasma(coor))
+            //        {
+            //            Console.ForegroundColor = colors[i];
+            //            Console.WriteLine("Hay fantasma en la dirección " + dirs[j].ToString() + " del fantasma " + i);
+            //            Console.ForegroundColor = ConsoleColor.Gray;
+            //        }
+            //    }
+            //}
 
-                }
-    
-            }
-
+            ////Posición siguiente de pacman
             //Coor nextPos = new Coor();
             //Console.Write(Siguiente(pers[0].pos, pers[0].dir, out nextPos));
             //nextPos.X = nextPos.X / 2;
@@ -324,8 +328,9 @@ namespace Practica2
 
             //Console.WriteLine();
 
+            ////Cantidad comida
             //Console.WriteLine("Número de comida: " + numComida);
-            
+
         }
 
         #region PacMan
@@ -467,11 +472,11 @@ namespace Practica2
             {
                 //Calculamos la coordenada siguiente
                 Coor nextCoor = new Coor();
-                nextCoor.X = (pers[fant].pos.X + dirs[i].X) / 2;
+                nextCoor.X = pers[fant].pos.X + dirs[i].X * 2;
                 nextCoor.Y = pers[fant].pos.Y + dirs[i].Y;
 
                 //Si no hay fantasma, ni muro en esa posición
-                if (!HayFantasma(nextCoor) && cas[nextCoor.X / 2, nextCoor.Y] != Casilla.Muro)
+                if (!HayFantasma(nextCoor) && cas[nextCoor.X / 2, nextCoor.Y] == Casilla.Libre)
                 {
                     //Añadimos esa dirección en los caminos posibles
                     cs.Add(dirs[i]);
