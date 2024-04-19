@@ -39,6 +39,8 @@ namespace Practica2
 
         private bool DEBUG = true; // Para mensajes de depuracion en consola
 
+        bool muroAbierto = false; //Bandera que marca si el muro de los fantasmas está abierto o no
+
         #endregion
 
         static void Main()
@@ -52,6 +54,7 @@ namespace Practica2
             char c = ' ';
             bool pillado = false;
 
+
             //Siempre y cuando no haya sido pillado y no se haya comido toda la comida, seguirá el juego
             while (!pillado && nivel.FinJuego())
             {
@@ -64,14 +67,14 @@ namespace Practica2
                 //Movemos en base al input
                 nivel.MuevePacman();
 
-                ////Comprobamos colisiones
-                //pillado = nivel.Captura();
+                //Comprobamos colisiones
+                pillado = nivel.Captura();
 
-                ////IA Fantasmas
-                nivel.MueveFantasmas(lapCarcelFantasmas);
+                //IA Fantasmas
+                nivel.MueveFantasmas(lap);
 
-                ////Comprobamos colisiones
-                //pillado = nivel.Captura();
+                //Comprobamos colisiones
+                pillado = nivel.Captura();
 
                 //Renderizamos 
                 nivel.Render();
@@ -342,6 +345,8 @@ namespace Practica2
             ////Cantidad comida
             //Console.WriteLine("Número de comida: " + numComida);
 
+            Console.WriteLine("Tiempo restante " + lapFantasmas);
+
         }
 
         #region PacMan
@@ -514,7 +519,7 @@ namespace Practica2
             
             if (PosiblesDirs(fant, out cs) == 1)
             {
-                pers[fant].dir = cs.PopElem();
+                //pers[fant].dir = cs.PopElem();
             }
             //Si tiene más de una dirección posible, eliminará la dirección contraria a la actual de la lista
             else
@@ -532,16 +537,16 @@ namespace Practica2
                 int i = 0;
                 while (i < k - 1)
                 {
-                    cs.Remove(cs.PopElem());
+                    //cs.Remove(cs.PopElem());
                 }
 
                 //Seleccionamos la que queda
-                pers[fant].dir = cs.PopElem();
+                //pers[fant].dir = cs.PopElem();
             }
             
         }
 
-        private void EliminaMuroFantasmas() //Por qué no se hace aquí el tema de quitar el muro después de x tiempo???
+        private void EliminaMuroFantasmas()
         {
             //Recorremos el tablero para encontrar todos los Casilla.MuroCelda
             for (int i = 0; i < cas.GetLength(1); i++)
@@ -557,8 +562,22 @@ namespace Practica2
             }
         }
 
-        private void MueveFantasmas(int lap) //No tengo claro cómo hacer lo del temporizador aquí
+        private void MueveFantasmas(int lap)
         {
+            //Muro
+            if (!muroAbierto) 
+            {
+                lapFantasmas -= lap;
+
+                if (lapFantasmas <= 0)
+                {
+                    EliminaMuroFantasmas();
+                    lapFantasmas = 0;
+                    muroAbierto = true;
+                }
+            }
+
+            //Movilidad de los fantasmas
             Coor newPos = new Coor();
             for (int i = 1; i < pers.Length; i++)
             {
@@ -582,14 +601,13 @@ namespace Practica2
         {
             bool pillado = false;
             int i = 1;
-            while (pers[i].pos != pers[0].pos)
+            while (i <= pers.Length - 1 && !pillado)
             {
+                if (pers[i].pos == pers[0].pos)
+                {
+                    pillado = true;
+                }
                 i++;
-            }
-
-            if (pers[i].pos == pers[0].pos)
-            {
-                pillado = true;
             }
 
             return pillado;
