@@ -28,7 +28,8 @@ namespace Practica2
         public SetCoor cs; // Posibles nuevas posiciones de fantasmas
 
         public Coor[] dirs = new Coor[4]; //Direcciones (1,0), (0,1), (-1, 0), (0, -1) 
-        public Coor[] muroFants = new Coor[4];
+
+        public SetCoor muroFants = new SetCoor(); //Posición del muro del fantasma
 
         const int lapCarcelFantasmas = 3000; // Retardo para quitar el muro a los fantasmas
         int lapFantasmas; // Tiempo restante para quitar el muro
@@ -398,6 +399,11 @@ namespace Practica2
                     {
                         pers[i].pos = pers[i].ini;
                     }
+
+                    //El muro se vuelve a cerrar y el tiempo se resetea
+                    ReiniciaMuroFantasmas();
+                    muroAbierto = false;
+                    lapFantasmas = lapCarcelFantasmas;
                 }
             }
         }
@@ -556,7 +562,28 @@ namespace Practica2
                     //Si son muros de celda, los deja libres
                     if (cas[j, i] == Casilla.MuroCelda)
                     {
+                        Coor muro = new Coor();
+                        muro.X = j;
+                        muro.Y = i;
+                        muroFants.Add(muro);
                         cas[j, i] = Casilla.Libre;
+                    }
+                }
+            }
+        }
+
+        private void ReiniciaMuroFantasmas()
+        {
+            for (int i = 0; i < cas.GetLength(1); i++)
+            {
+                for (int j = 0; j < cas.GetLength(0); j++)
+                {
+                    Coor muro = new Coor();
+                    muro.X = j;
+                    muro.Y = i;
+                    if (muroFants.IsElementOf(muro))
+                    {
+                        cas[j, i] = Casilla.MuroCelda;
                     }
                 }
             }
