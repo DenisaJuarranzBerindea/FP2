@@ -525,7 +525,7 @@ namespace Practica2
             
             if (PosiblesDirs(fant, out cs) == 1)
             {
-                //pers[fant].dir = cs.PopElem();
+                pers[fant].dir = cs.PopElem();
             }
             //Si tiene más de una dirección posible, eliminará la dirección contraria a la actual de la lista
             else
@@ -543,11 +543,12 @@ namespace Practica2
                 int i = 0;
                 while (i < k - 1)
                 {
-                    //cs.Remove(cs.PopElem());
+                    cs.Remove(cs.PopElem());
+                    i++;
                 }
 
                 //Seleccionamos la que queda
-                //pers[fant].dir = cs.PopElem();
+                pers[fant].dir = cs.PopElem();
             }
             
         }
