@@ -71,6 +71,16 @@ class SetCoor
         }
     }
 
+    // Escoge una coordenada concreta
+    public Coor PickElement(int i)
+    {
+        if (i > coors.Length) throw new Exception("Error SetCoor.GetElem: Index out of array");
+        else
+        {
+            return coors[i];
+        }
+    }
+
     public bool Empty() { return oc == 0; }
     public int Size() { return oc; }
 

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using Coordinates;
 using SetArray;
+using Tab;
 
 namespace Practica2
 {
@@ -49,15 +50,12 @@ namespace Practica2
             Tablero nivel = new Tablero("levels/level00.dat");
             nivel.Render();
 
-            nivel.InicializaDirecciones();
-
             int lap = 200; //Retardo
             char c = ' ';
             bool pillado = false;
 
-
             //Siempre y cuando no haya sido pillado y no se haya comido toda la comida, seguirá el juego
-            while (!pillado && nivel.FinJuego())
+            while (!pillado && !nivel.FinJuego())
             {
                 //Leemos el input del usuario
                 LeeInput(ref c);
@@ -67,15 +65,15 @@ namespace Practica2
 
                 //Movemos en base al input
                 nivel.MuevePacman();
-
-                //Comprobamos colisiones
-                pillado = nivel.Captura();
+                 
+                ////Comprobamos colisiones
+                //pillado = nivel.Captura();
 
                 //IA Fantasmas
                 nivel.MueveFantasmas(lap);
 
-                //Comprobamos colisiones
-                pillado = nivel.Captura();
+                ////Comprobamos colisiones
+                //pillado = nivel.Captura();
 
                 //Renderizamos 
                 nivel.Render();
@@ -204,6 +202,8 @@ namespace Practica2
 
         }
 
+        #region Renders
+
         private void Render()
         {
             Console.Clear();
@@ -309,46 +309,17 @@ namespace Practica2
                     Console.WriteLine("PacMan: Dirección " + pers[0].dir.ToString() + " Posición " + posUsuario.ToString());
                 }
                 else //Fantasmas
-                { 
-                    Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString() +  " Posibles direcciones: " + PosiblesDirs(i, out cs)); 
+                {
+                    Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString() + " Posibles direcciones: " + PosiblesDirs(i, out cs));
                     Console.WriteLine(cs.ToString());
-                    
+
                 }
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
 
-            ////Fantasmas alrededor
-            //for (int i = 1; i < pers.Length; i++)
-            //{
-            //    for (int j = 0; j < dirs.Length; j++)
-            //    {
-            //        Coor coor = new Coor();
-            //        coor.X = pers[i].pos.X + dirs[j].X * 2;
-            //        coor.Y = pers[i].pos.Y + dirs[j].Y;
-
-            //        if (HayFantasma(coor))
-            //        {
-            //            Console.ForegroundColor = colors[i];
-            //            Console.WriteLine("Hay fantasma en la dirección " + dirs[j].ToString() + " del fantasma " + i);
-            //            Console.ForegroundColor = ConsoleColor.Gray;
-            //        }
-            //    }
-            //}
-
-            ////Posición siguiente de pacman
-            //Coor nextPos = new Coor();
-            //Console.Write(Siguiente(pers[0].pos, pers[0].dir, out nextPos));
-            //nextPos.X = nextPos.X / 2;
-            //Console.Write(nextPos.ToString());
-
-            //Console.WriteLine();
-
-            ////Cantidad comida
-            //Console.WriteLine("Número de comida: " + numComida);
-
-            Console.WriteLine("Tiempo restante " + lapFantasmas);
-
         }
+
+        #endregion
 
         #region PacMan
 
@@ -363,7 +334,7 @@ namespace Practica2
             else newPos.Y = cas.GetLength(1) - 1;
 
             //Si no hay muro, podrá seguir
-            if (cas[newPos.X / 2, newPos.Y] != Casilla.Muro)
+            if (cas[newPos.X / 2, newPos.Y] != Casilla.Muro && cas[newPos.X / 2, newPos.Y] != Casilla.MuroCelda)
             { 
                 return true;
             }
@@ -494,62 +465,43 @@ namespace Practica2
             {
                 //Calculamos la coordenada siguiente
                 Coor nextCoor = new Coor();
-                nextCoor.X = pers[fant].pos.X + dirs[i].X * 2;
-                nextCoor.Y = pers[fant].pos.Y + dirs[i].Y;
 
                 //Si no hay fantasma, ni muro en esa posición
-                if (!HayFantasma(nextCoor) && cas[nextCoor.X / 2, nextCoor.Y] == Casilla.Libre &&
-                    cas[nextCoor.X / 2, nextCoor.Y] != Casilla.Muro && 
-                    cas[nextCoor.X / 2, nextCoor.Y] != Casilla.MuroCelda)
+                if (Siguiente(pers[fant].pos, dirs[i], out nextCoor) && !HayFantasma(nextCoor) )
                 {
                     //Añadimos esa dirección en los caminos posibles
                     cs.Add(dirs[i]);
                 }
             }
 
-            return cs.Size();
-
-        }
-
-        ///*utiliza el método anterior para obtener el conjunto de posibles direcciones para el fantasma fant y después elige una aleatoria según lo explicado.
-         //*/
-         //A ver, técnicamente para elegir la dirección nueva, hay que quitar k-1 elementos y luego coger el que quede(?
-        private void SeleccionaDir(int fant)
-        {
-            SetCoor cs = new SetCoor();
-            if (cs.Empty())
-            {
-                pers[fant].dir = new Coor();
-            }
-            //Si solo tiene una dirección posible seguirá por esa
-            
-            if (PosiblesDirs(fant, out cs) == 1)
-            {
-                pers[fant].dir = cs.PopElem();
-            }
-            //Si tiene más de una dirección posible, eliminará la dirección contraria a la actual de la lista
-            else
+            //Comprobamos las direcciones posibles
+            //Si hay más de una dirección posible
+            if (cs.Size() > 1)
             {
                 //Eliminamos la contraria
                 Coor contraria = new Coor();
                 contraria.X = pers[fant].dir.X * -1;
                 contraria.Y = pers[fant].dir.Y * -1;
-                cs.Remove(contraria);
 
-                //Random
-                Random rnd = new Random();
-                int k = rnd.Next(0, cs.Size());
-
-                int i = 0;
-                while (i < k - 1)
-                {
-                    cs.Remove(cs.PopElem());
-                    i++;
-                }
-
-                //Seleccionamos la que queda
-                pers[fant].dir = cs.PopElem();
+                if (cs.IsElementOf(contraria)) cs.Remove(contraria);
             }
+            //Y si no hay direcciones posibles, añadimos 0,0
+            else if (cs.Size() == 0)
+            {
+                cs.Add(new Coor(0, 0));
+            }
+
+            return cs.Size();
+
+        }
+
+        private void SeleccionaDir(int fant)
+        {
+            SetCoor cs;
+            PosiblesDirs(fant, out cs);
+
+            int index = rnd.Next(cs.Size());
+            pers[fant].dir = cs.PickElement(index);
             
         }
 
@@ -609,13 +561,12 @@ namespace Practica2
             Coor newPos = new Coor();
             for (int i = 1; i < pers.Length; i++)
             {
+                SeleccionaDir(i);
                 //Si la dirección seleccionada es válida
                 if (Siguiente(pers[i].pos, pers[i].dir, out newPos))
                 {
-                    SeleccionaDir(i);
                     //Se mueve a esa posición
-                    pers[i].pos.X = newPos.X;
-                    pers[i].pos.Y = newPos.Y;
+                    pers[i].pos = newPos;
                 }
             }
         }
@@ -643,15 +594,15 @@ namespace Practica2
 
         private bool FinJuego()
         {
-            return numComida > 0;
+            return numComida < 0;
         }
 
         #endregion
 
-
+        #region Auxiliares coordenadas
         private void InicializaDirecciones()
         {
-            for (int i = 0; i < dirs.Length; i++) 
+            for (int i = 0; i < dirs.Length; i++)
             {
                 dirs[i] = new Coor();
             }
@@ -668,5 +619,6 @@ namespace Practica2
             dirs[3].X = 0;
             dirs[3].Y = -1;
         }
+        #endregion
     }
 }
