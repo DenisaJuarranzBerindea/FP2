@@ -352,32 +352,36 @@ namespace Practica2
                 pers[0].pos.X = newPos.X;
                 pers[0].pos.Y = newPos.Y;
 
-                //Si hay comida
-                if (cas[newPos.X / 2, newPos.Y] == Casilla.Comida ||
-                    cas[newPos.X / 2, newPos.Y] == Casilla.Vitamina)
-                {
-                    //Se la come
-                    numComida--;
-                    //Dejando la casilla libre
-                    cas[newPos.X / 2, newPos.Y] = Casilla.Libre;
-                }
-                
-                //Ademas, si es vitamina
-                if (cas[newPos.X / 2, newPos.Y] == Casilla.Vitamina)
-                {
-                    //Devuelve a los fantasmas a su posicion inicial
-                    for (int i = 1; i < pers.Length; i++)
-                    {
-                        pers[i].pos = pers[i].ini;
-                    }
-
-                    //El muro se vuelve a cerrar y el tiempo se resetea
-                    ReiniciaMuroFantasmas();
-                    muroAbierto = false;
-                    lapFantasmas = lapCarcelFantasmas;
-                }
             }
-        }
+
+            //Si hay comida
+            if (cas[pers[0].pos.X / 2, pers[0].pos.Y] == Casilla.Comida)
+            {
+                //Se la come
+                numComida--;
+                //Dejando la casilla libre
+                cas[pers[0].pos.X / 2, pers[0].pos.Y] = Casilla.Libre;
+            }
+            //Si es vitamina
+            else if (cas[pers[0].pos.X / 2, pers[0].pos.Y] == Casilla.Vitamina)
+            {
+                //Se la come
+                numComida--;
+                //Dejando la casilla libre
+                cas[pers[0].pos.X / 2, pers[0].pos.Y] = Casilla.Libre;
+                //Devuelve a los fantasmas a su posicion inicial
+                for (int i = 1; i < pers.Length; i++)
+                {
+                    pers[i].pos = pers[i].ini;
+                }
+
+                //El muro se vuelve a cerrar y el tiempo se resetea
+                ReiniciaMuroFantasmas();
+                muroAbierto = false;
+                lapFantasmas = lapCarcelFantasmas;
+            }
+        
+    }
 
         private bool CambiaDir(char c)
         {
