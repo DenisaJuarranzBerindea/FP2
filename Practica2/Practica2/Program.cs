@@ -425,13 +425,14 @@ namespace Practica2
         {
             if (Console.KeyAvailable)
             {
-                string tecla = Console.ReadKey(true).Key.ToString();
+                string tecla = Console.ReadKey(true).Key.ToString().ToUpper();
                 switch (tecla)
                 {
                     case "LeftArrow": dir = 'l'; break;
                     case "UpArrow": dir = 'u'; break;
                     case "RightArrow": dir = 'r'; break;
                     case "DownArrow": dir = 'd'; break;
+                    case "P": dir = 'p'; break; //Pausa
                 }
             }
             while (Console.KeyAvailable) Console.ReadKey().Key.ToString();
@@ -623,6 +624,82 @@ namespace Practica2
             dirs[3].X = 0;
             dirs[3].Y = -1;
         }
+        #endregion
+
+        #region Partida (Extras)
+
+        public void GuardarPartida()
+        {
+            //Abrimos guardado
+            StreamWriter partida = new StreamWriter("partida.txt");
+
+            //Recorremos el tablero 
+            for (int i = 0; i < cas.GetLength(1); i++)
+            {
+                for (int j = 0; j < cas.GetLength(0); j++)
+                {
+                    if (cas[j, i] == Casilla.Libre)
+                    {
+                        partida.Write(" 0");
+                    }
+                    else if (cas[j, i] == Casilla.Muro)
+                    {
+                        partida.Write(" 1");
+                    }
+                    else if (cas[j, i] == Casilla.Comida)
+                    {
+                        partida.Write(" 2");
+                    }
+                    else if (cas[j, i] == Casilla.Vitamina)
+                    {
+                        partida.Write(" 3");
+                    }
+                    else if (cas[j, i] == Casilla.MuroCelda)
+                    {
+                        partida.Write(" 4");
+                    }
+
+                    //Guardamos los personajes
+                    for (int k = 0; k < pers.Length; k++)
+                    {
+                        if (k > 1 && pers[k].pos.X == j && pers[k].pos.Y == i) //Fantasmas
+                        {
+                            partida.Write(" " + (4 + k));
+                        }
+                        else if (k == 0 && pers[k].pos.X == j && pers[k].pos.Y == i) //Pacman
+                        {
+                            partida.Write(" 9");
+                        }
+                    }
+                }
+
+                partida.WriteLine();
+            }
+
+            //Cerramos guardado
+            partida.Close();
+
+        } //Testear
+        public void PausaPartida(Tablero tab) //Testear
+        {
+            Console.Clear();
+
+            Console.WriteLine("0 >> Guardar y salir");
+            Console.WriteLine("Cualquier otra tecla >> Continuar");
+
+            int n = int.Parse(Console.ReadLine());
+
+            if (n == 0)
+            {                
+                tab.GuardarPartida();
+                Console.WriteLine("Partida guardada");
+            }
+        }
+        public void CambioNivel()
+        {
+
+        }
+
         #endregion
     }
 }
