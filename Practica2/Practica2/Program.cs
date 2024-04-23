@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Drawing;
 using Coordinates;
 using SetArray;
-using Tab;
 
 namespace Practica2
 {
@@ -47,7 +46,7 @@ namespace Practica2
 
         static void Main()
         {
-            Tablero nivel = new Tablero("levels/level00.dat");
+            Tablero nivel = new Tablero("levels/level05.dat");
             nivel.Render();
 
             int lap = 200; //Retardo
@@ -61,7 +60,12 @@ namespace Practica2
                 LeeInput(ref c);
 
                 //Procesamos el input
-                if (c != ' ' && nivel.CambiaDir(c)) c = ' ';
+                if (c == 'p')
+                {
+                    nivel.PausaPartida(nivel);
+                    c = ' ';
+                }
+                else if (c != ' ' && nivel.CambiaDir(c)) c = ' ';
 
                 //Movemos en base al input
                 nivel.MuevePacman();
@@ -310,8 +314,8 @@ namespace Practica2
                 }
                 else //Fantasmas
                 {
-                    Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString() + " Posibles direcciones: " + PosiblesDirs(i, out cs));
-                    Console.WriteLine(cs.ToString());
+                    Console.WriteLine("Fantasma: Dirección " + pers[i].dir.ToString() + " Posición " + posUsuario.ToString() /*+ " Posibles direcciones: " + PosiblesDirs(i, out cs)*/);
+                    //Console.WriteLine(cs.ToString());
 
                 }
                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -381,7 +385,7 @@ namespace Practica2
                 lapFantasmas = lapCarcelFantasmas;
             }
         
-    }
+        }
 
         private bool CambiaDir(char c)
         {
@@ -425,14 +429,15 @@ namespace Practica2
         {
             if (Console.KeyAvailable)
             {
-                string tecla = Console.ReadKey(true).Key.ToString().ToUpper();
+                string tecla = Console.ReadKey(true).Key.ToString();
                 switch (tecla)
                 {
                     case "LeftArrow": dir = 'l'; break;
                     case "UpArrow": dir = 'u'; break;
                     case "RightArrow": dir = 'r'; break;
                     case "DownArrow": dir = 'd'; break;
-                    case "P": dir = 'p'; break; //Pausa
+                    case "p": dir = 'p' ; break; //Pausa
+                    case "P": dir = 'p' ; break; //Pausa pero en mayus...
                 }
             }
             while (Console.KeyAvailable) Console.ReadKey().Key.ToString();
@@ -627,7 +632,6 @@ namespace Practica2
         #endregion
 
         #region Partida (Extras)
-
         public void GuardarPartida()
         {
             //Abrimos guardado
@@ -687,9 +691,9 @@ namespace Practica2
             Console.WriteLine("0 >> Guardar y salir");
             Console.WriteLine("Cualquier otra tecla >> Continuar");
 
-            int n = int.Parse(Console.ReadLine());
+            char n = char.Parse(Console.ReadLine());
 
-            if (n == 0)
+            if (n == '0')
             {                
                 tab.GuardarPartida();
                 Console.WriteLine("Partida guardada");
