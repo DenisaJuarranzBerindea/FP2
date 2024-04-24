@@ -47,7 +47,7 @@ namespace Practica2
 
         static void Main()
         {
-            Tablero nivel = new Tablero("levels/level01.dat");
+            Tablero nivel = new Tablero("levels/level00.dat");
             nivel.Render();
 
             int lap = 200; //Retardo
@@ -55,7 +55,7 @@ namespace Practica2
             bool pillado = false;
 
             //Siempre y cuando no haya sido pillado y no se haya comido toda la comida, seguirá el juego
-            while (!pillado && !nivel.FinJuego())
+            while (!pillado && !nivel.FinJuego() && c != 'q')
             {
                 //Leemos el input del usuario
                 LeeInput(ref c);
@@ -66,7 +66,8 @@ namespace Practica2
                     nivel.PausaPartida(nivel);
                     c = ' ';
                 }
-                else if (c != ' ' && nivel.CambiaDir(c)) c = ' ';
+                else if (c != ' ' && c != 'q' && nivel.CambiaDir(c)) c = ' ';
+
 
                 //Movemos en base al input
                 nivel.MuevePacman();
@@ -94,6 +95,28 @@ namespace Practica2
             else if (pillado)
             {
                 Console.WriteLine("Oh, vaya... se te ha comido el coco");
+            }
+            else if (c == 'q')
+            {
+                Console.Clear();
+
+                Console.WriteLine("¿Quiere guardar partida?");
+                Console.WriteLine("0 >> Si");
+                Console.WriteLine("1 >> No");
+
+                int n = int.Parse(Console.ReadLine());
+
+                if (n == 0)
+                {
+                    nivel.GuardarPartida();
+                    Console.WriteLine("Partida guardada");
+                    Console.WriteLine("Gracias por jugar");
+                }
+                else if (n == 1)
+                {
+                    Console.WriteLine("Gracias por jugar");
+                }
+               
             }
         }
 
@@ -437,8 +460,10 @@ namespace Practica2
                     case "UpArrow": dir = 'u'; break;
                     case "RightArrow": dir = 'r'; break;
                     case "DownArrow": dir = 'd'; break;
-                    case "p": dir = 'p' ; break; //Pausa
-                    case "P": dir = 'p' ; break; //Pausa pero en mayus...
+                    case "p": dir = 'p'; break; //Pausa
+                    case "P": dir = 'p'; break; //Pausa pero en mayus...
+                    case "q": dir = 'q'; break; //Salir
+                    case "Q": dir = 'q'; break; //Salir pero en mayus... 
                 }
             }
             while (Console.KeyAvailable) Console.ReadKey().Key.ToString();
@@ -637,14 +662,28 @@ namespace Practica2
             //Abrimos guardado
             StreamWriter partida = new StreamWriter("partida.txt");
 
+            int k = 0;
             //Recorremos el tablero 
-            for (int i = 0; i < cas.GetLength(1); i++)
+            for (int i = 0; i < cas.GetLength(1) && k < pers.Length; i++)
             {
-                for (int j = 0; j < cas.GetLength(0); j++)
+                for (int j = 0; j < cas.GetLength(0) && k < pers.Length; j++)
                 {
                     if (cas[j, i] == Casilla.Libre)
                     {
-                        partida.Write(" 0");
+                        if (k >= 1 && pers[k].pos.X == j && pers[k].pos.Y == i) //Fantasmas
+                        {
+                            partida.Write("0" + 4 + k);
+                            k++;
+                        }
+                        else if (k == 0 && pers[k].pos.X == j && pers[k].pos.Y == i) //Pacman
+                        {
+                            partida.Write("09");
+                            k++;
+                        }
+                        else
+                        {
+                            partida.Write("00");
+                        }
                     }
                     else if (cas[j, i] == Casilla.Muro)
                     {
@@ -663,22 +702,12 @@ namespace Practica2
                         partida.Write(" 4");
                     }
 
-                    //Guardamos los personajes
-                    for (int k = 0; k < pers.Length; k++)
-                    {
-                        if (k > 1 && pers[k].pos.X == j && pers[k].pos.Y == i) //Fantasmas
-                        {
-                            partida.Write(" " + (4 + k));
-                        }
-                        else if (k == 0 && pers[k].pos.X == j && pers[k].pos.Y == i) //Pacman
-                        {
-                            partida.Write(" 9");
-                        }
-                    }
                 }
 
                 partida.WriteLine();
             }
+
+            //Poner en las siguientes direccion de pers e ini de los fantasmas
 
             //Cerramos guardado
             partida.Close();
@@ -708,7 +737,6 @@ namespace Practica2
             Tablero nivel = new Tablero("levels/level" + level + ".dat");
 
         }
-
         public bool JuegaNivel(string level)
         {
             //Daremos por hecho que inicialmente no se ha superado el nivel
