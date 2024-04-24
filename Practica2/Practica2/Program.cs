@@ -3,6 +3,7 @@
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Drawing;
+using System.Reflection.Emit;
 using Coordinates;
 using SetArray;
 
@@ -46,7 +47,7 @@ namespace Practica2
 
         static void Main()
         {
-            Tablero nivel = new Tablero("levels/level05.dat");
+            Tablero nivel = new Tablero("levels/level01.dat");
             nivel.Render();
 
             int lap = 200; //Retardo
@@ -69,14 +70,14 @@ namespace Practica2
 
                 //Movemos en base al input
                 nivel.MuevePacman();
-                 
-                ////Comprobamos colisiones
+
+                //Comprobamos colisiones
                 //pillado = nivel.Captura();
 
                 //IA Fantasmas
                 nivel.MueveFantasmas(lap);
 
-                ////Comprobamos colisiones
+                //Comprobamos colisiones
                 //pillado = nivel.Captura();
 
                 //Renderizamos 
@@ -585,7 +586,6 @@ namespace Practica2
         #endregion
 
         #region Logica fin juego
-
         private bool Captura()
         {
             bool pillado = false;
@@ -604,7 +604,7 @@ namespace Practica2
 
         private bool FinJuego()
         {
-            return numComida < 0;
+            return numComida <= 0;
         }
 
         #endregion
@@ -689,19 +689,52 @@ namespace Practica2
             Console.Clear();
 
             Console.WriteLine("0 >> Guardar y salir");
-            Console.WriteLine("Cualquier otra tecla >> Continuar");
+            Console.WriteLine("1 >> Continuar");
 
-            char n = char.Parse(Console.ReadLine());
+            int n = char.Parse(Console.ReadLine());
 
-            if (n == '0')
+            if (n == 0)
             {                
                 tab.GuardarPartida();
                 Console.WriteLine("Partida guardada");
             }
         }
-        public void CambioNivel()
+        public void IniciaNivel()
         {
+            Console.WriteLine("Inserte un nivel para jugar");
+            //Leemos el nivel de teclado
+            Console.WriteLine("Nivel: XX");
+            string level = Console.ReadLine();
+            Tablero nivel = new Tablero("levels/level" + level + ".dat");
 
+        }
+
+        public bool JuegaNivel(string level)
+        {
+            //Daremos por hecho que inicialmente no se ha superado el nivel
+            bool superado = false;
+
+            //Inicializamos
+            Tablero nivel = new Tablero("levels/level" + level + ".dat");
+            Render();
+            char c = ' ';
+
+            //while (!FinJuego() && c != 'q')
+            //{
+            //    nivel.LeeInput(ref c);
+            //    Render(tablero, act, ori);
+            //}
+
+            //if (FinJuego())
+            //{
+            //    superado = true;
+            //}
+            //else if (LeeInput() == 'q')
+            //{
+            //    superado = false;
+            //}
+
+            return superado;
         }
 
         #endregion
