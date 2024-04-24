@@ -73,13 +73,13 @@ namespace Practica2
                 nivel.MuevePacman();
 
                 //Comprobamos colisiones
-                //pillado = nivel.Captura();
+                pillado = nivel.Captura();
 
                 //IA Fantasmas
                 nivel.MueveFantasmas(lap);
 
                 //Comprobamos colisiones
-                //pillado = nivel.Captura();
+                pillado = nivel.Captura();
 
                 //Renderizamos 
                 nivel.Render();
@@ -116,7 +116,6 @@ namespace Practica2
                 {
                     Console.WriteLine("Gracias por jugar");
                 }
-               
             }
         }
 
@@ -187,7 +186,14 @@ namespace Practica2
                             cas[j, i] = Casilla.Vitamina;
                             numComida++;
                         }
-                        else if (fila[j] == "4") cas[j, i] = Casilla.MuroCelda;
+                        else if (fila[j] == "4")
+                        {
+                            cas[j, i] = Casilla.MuroCelda;
+                            Coor muro = new Coor();
+                            muro.X = j;
+                            muro.Y = i;
+                            muroFants.Add(muro);
+                        }
                         //Personajes
                         else if (int.Parse(fila[j]) > 4)
                         {
@@ -551,10 +557,6 @@ namespace Practica2
                     //Si son muros de celda, los deja libres
                     if (cas[j, i] == Casilla.MuroCelda)
                     {
-                        Coor muro = new Coor();
-                        muro.X = j;
-                        muro.Y = i;
-                        muroFants.Add(muro);
                         cas[j, i] = Casilla.Libre;
                     }
                 }
@@ -654,6 +656,7 @@ namespace Practica2
             dirs[3].X = 0;
             dirs[3].Y = -1;
         }
+
         #endregion
 
         #region Partida (Extras)
@@ -662,28 +665,14 @@ namespace Practica2
             //Abrimos guardado
             StreamWriter partida = new StreamWriter("partida.txt");
 
-            int k = 0;
             //Recorremos el tablero 
-            for (int i = 0; i < cas.GetLength(1) && k < pers.Length; i++)
+            for (int i = 0; i < cas.GetLength(1); i++)
             {
-                for (int j = 0; j < cas.GetLength(0) && k < pers.Length; j++)
+                for (int j = 0; j < cas.GetLength(0); j++)
                 {
                     if (cas[j, i] == Casilla.Libre)
                     {
-                        if (k >= 1 && pers[k].pos.X == j && pers[k].pos.Y == i) //Fantasmas
-                        {
-                            partida.Write("0" + 4 + k);
-                            k++;
-                        }
-                        else if (k == 0 && pers[k].pos.X == j && pers[k].pos.Y == i) //Pacman
-                        {
-                            partida.Write("09");
-                            k++;
-                        }
-                        else
-                        {
-                            partida.Write("00");
-                        }
+                        partida.Write(" 0");
                     }
                     else if (cas[j, i] == Casilla.Muro)
                     {
@@ -701,70 +690,46 @@ namespace Practica2
                     {
                         partida.Write(" 4");
                     }
-
                 }
 
                 partida.WriteLine();
             }
 
-            //Poner en las siguientes direccion de pers e ini de los fantasmas
+            //Personajes
+            for (int i = 0; i < pers.Length; i++) 
+            {
+                partida.WriteLine(pers[i].ini);
+                partida.WriteLine(pers[i].pos);
+                partida.WriteLine(pers[i].dir);
+            }
+
+            //Muro fantasmas
+            partida.WriteLine(muroFants.ToString());
 
             //Cerramos guardado
             partida.Close();
 
-        } //Testear
-        public void PausaPartida(Tablero tab) //Testear
+        } 
+
+        public void PausaPartida(Tablero tab) 
         {
             Console.Clear();
 
-            Console.WriteLine("0 >> Guardar y salir");
-            Console.WriteLine("1 >> Continuar");
+            Console.WriteLine("Pulsa cualquier tecla para continuar");
 
-            int n = char.Parse(Console.ReadLine());
+            char c = char.Parse(Console.ReadLine());
 
-            if (n == 0)
-            {                
-                tab.GuardarPartida();
-                Console.WriteLine("Partida guardada");
-            }
+            Console.WriteLine("3");
+            // retardo
+            System.Threading.Thread.Sleep(500);
+            Console.WriteLine("2");
+            // retardo
+            System.Threading.Thread.Sleep(500);
+            Console.WriteLine("1");
+            // retardo
+            System.Threading.Thread.Sleep(500);
         }
-        public void IniciaNivel()
-        {
-            Console.WriteLine("Inserte un nivel para jugar");
-            //Leemos el nivel de teclado
-            Console.WriteLine("Nivel: XX");
-            string level = Console.ReadLine();
-            Tablero nivel = new Tablero("levels/level" + level + ".dat");
-
-        }
-        public bool JuegaNivel(string level)
-        {
-            //Daremos por hecho que inicialmente no se ha superado el nivel
-            bool superado = false;
-
-            //Inicializamos
-            Tablero nivel = new Tablero("levels/level" + level + ".dat");
-            Render();
-            char c = ' ';
-
-            //while (!FinJuego() && c != 'q')
-            //{
-            //    nivel.LeeInput(ref c);
-            //    Render(tablero, act, ori);
-            //}
-
-            //if (FinJuego())
-            //{
-            //    superado = true;
-            //}
-            //else if (LeeInput() == 'q')
-            //{
-            //    superado = false;
-            //}
-
-            return superado;
-        }
-
+      
         #endregion
     }
 }
