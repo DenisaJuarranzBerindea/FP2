@@ -299,7 +299,7 @@ namespace Practica2
         {
             for (int i = 0; i < pers.Length; i++)
             {
-                Console.SetCursorPosition(pers[i].pos.X, pers[i].pos.Y);
+                Console.SetCursorPosition(pers[i].pos.X * 2, pers[i].pos.Y);
                 Console.BackgroundColor = colors[i];
                 if (i == 0) //PacMan
                 {
@@ -459,8 +459,9 @@ namespace Practica2
             if (Console.KeyAvailable)
             {
                 string tecla = Console.ReadKey(true).Key.ToString();
-                switch (tecla)
+                switch (tecla.ToUpper())
                 {
+                    case "LEFTARROW": dir = 'l'; break;
                     case "LeftArrow": dir = 'l'; break;
                     case "UpArrow": dir = 'u'; break;
                     case "RightArrow": dir = 'r'; break;
@@ -704,6 +705,8 @@ namespace Practica2
 
             //Muro fantasmas
             partida.WriteLine(muroFants.ToString());
+            partida.WriteLine(muroAbierto);
+            if (muroAbierto) partida.WriteLine(lapFantasmas);
 
             //Cerramos guardado
             partida.Close();
