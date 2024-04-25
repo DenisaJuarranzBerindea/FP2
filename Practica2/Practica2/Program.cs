@@ -68,7 +68,6 @@ namespace Practica2
                 }
                 else if (c != ' ' && c != 'q' && nivel.CambiaDir(c)) c = ' ';
 
-
                 //Movemos en base al input
                 nivel.MuevePacman();
 
@@ -631,7 +630,7 @@ namespace Practica2
 
         private bool FinJuego()
         {
-            return numComida <= 0;
+            return numComida == 0;
         }
 
         #endregion
